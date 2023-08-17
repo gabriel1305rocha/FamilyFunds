@@ -33,7 +33,7 @@ If you wish to contribute to FamilyFunds, follow these steps:
 - Back-end: Node.js
 - Database: postgreSQL
 - Integration: Azure DevOps, GitHub Actions
-- Hosting: 
+- Hosting: X
 
 ## License
 
