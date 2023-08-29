@@ -30,7 +30,7 @@ If you wish to contribute to FamilyFunds, follow these steps:
 ## Technologies Used
 
 - Front-end: Dart (Flutter)
-- Back-end: Node.js
+- Back-end: Python.py
 - Database: postgreSQL
 - Integration: Azure DevOps, GitHub Actions
 - Hosting: XX
