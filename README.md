@@ -1,7 +1,10 @@
 # FamilyFunds - Finance and Family Activities Management System
-
+<h4 align="center"> 
+	🚧  🚀 Under construction...  🚧
+</h4>
 
 FamilyFunds is a finance and family activities management system designed to help families control their expenses, save, and plan effectively. The system offers an intuitive interface that enables users to track their finances and also keep track of their family activities.
+
 
 ## Key Features
 
