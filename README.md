@@ -8,13 +8,15 @@ FamilyFunds is a finance and family activities management system designed to hel
 
 ## Key Features
 
-- **Expense and Income Tracking:** Users can easily input their expenses and income, categorize them, and keep track of their cash flows.
+- :heavy_multiplication_x: **Expense and Income Tracking:** Users can easily input their expenses and income, categorize them, and keep track of their cash flows.
 
-- **Family Budgeting:** The system allows families to set monthly budgets for different expense and income categories, aiding in controlling overspending.
+- :heavy_multiplication_x: **Family Budgeting:** The system allows families to set monthly budgets for different expense and income categories, aiding in controlling overspending.
 
-- **Long-Term Financial Planning:** FamilyFunds offers advanced features for long-term financial planning, including savings goals, investments, and retirement planning.
+- :heavy_multiplication_x: **Long-Term Financial Planning:** FamilyFunds offers advanced features for long-term financial planning, including savings goals, investments, and retirement planning.
 
-- **Family Activities:** In addition to financial management, the system enables families to plan and organize activities such as trips, special events, and family goals.
+- :heavy_multiplication_x: **Family Activities:** In addition to financial management, the system enables families to plan and organize activities such as trips, special events, and family goals.
+
+## Prerequisites
 
 ## How to Contribute
 
@@ -38,15 +40,15 @@ If you wish to contribute to FamilyFunds, follow these steps:
 
 ## Technologies Used
 
-- Front-end: Dart (Flutter)
-- Back-end: Node.js
-- Database: postgreSQL
+- [Flutter](https://flutter.dev/)
+- [Node.js](https://nodejs.org/en/)
+- [PostgreSQL](https://www.postgresql.org/)
 - Integration: Azure DevOps, GitHub Actions
 - Hosting: XX
 
 ## License
 
-This project is under the Personal License
+This project is under the [Personal License](#license)
 
 ---
 
