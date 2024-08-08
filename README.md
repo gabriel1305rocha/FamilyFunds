@@ -19,18 +19,24 @@ If you wish to contribute to FamilyFunds, follow these steps:
 
 1. clone this repository.
 
-2. Create a new branch for your changes: `git checkout -b your-new-feature`.
+2. Create a new branch for your changes:
+      `git checkout -b feature/your-new-feature`
+   or `git checkout -b bugfix/your-bugfix`
+   or `git checkout -b refactor/your-refactor`
 
-3. Make desired changes and commit them: `git commit -m 'Added a new feature'`.
+4. Make desired changes and commit them using good message commits:
+   `git commit -m 'Update {your feature description}'`
+   or `git commit -m 'BugFix {your bug description}'`
+   or `git commit -m 'Refactor {your refactor description}'`
 
-4. Push to the branch: `git push origin your-new-feature`.
+6. Push to the branch: `git push origin your-branch`.
 
-5. Submit a pull request indicating your changes.
+7. Submit a pull request indicating your changes.
 
 ## Technologies Used
 
 - Front-end: Dart (Flutter)
-- Back-end: Python.py
+- Back-end: Node.js
 - Database: postgreSQL
 - Integration: Azure DevOps, GitHub Actions
 - Hosting: XX
