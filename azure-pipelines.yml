@@ -1,19 +1,46 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  - main
 
-pool:
-  vmImage: ubuntu-latest
+pr:
+  - main
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+jobs:
+  - job: backend
+    displayName: API (Node.js + PostgreSQL)
+    pool:
+      vmImage: ubuntu-latest
+    services:
+      postgres: postgres
+    variables:
+      TEST_DATABASE_URL: postgres://familyfunds:familyfunds@localhost:5432/familyfunds_test
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '22.x'
+      - script: npm ci && npm test
+        workingDirectory: backend
+        displayName: Instalar dependências e rodar testes
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  - job: app
+    displayName: App (Flutter)
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+      - script: |
+          git clone --depth 1 --branch stable https://github.com/flutter/flutter.git $(Agent.TempDirectory)/flutter
+          echo "##vso[task.prependpath]$(Agent.TempDirectory)/flutter/bin"
+        displayName: Instalar Flutter
+      - script: flutter pub get && flutter analyze && flutter test
+        workingDirectory: app
+        displayName: Analisar e testar
+
+resources:
+  containers:
+    - container: postgres
+      image: postgres:16-alpine
+      ports:
+        - 5432:5432
+      env:
+        POSTGRES_USER: familyfunds
+        POSTGRES_PASSWORD: familyfunds
+        POSTGRES_DB: familyfunds_test

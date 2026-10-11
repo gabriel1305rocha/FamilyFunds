@@ -8,15 +8,66 @@ FamilyFunds is a finance and family activities management system designed to hel
 
 ## Key Features
 
-- :heavy_multiplication_x: **Expense and Income Tracking:** Users can easily input their expenses and income, categorize them, and keep track of their cash flows.
+- :heavy_check_mark: **Expense and Income Tracking:** Users can easily input their expenses and income, categorize them, and keep track of their cash flows — per family member (e.g. you and your spouse), per checking account and per credit card (with installments, bill cycle and limit usage).
 
-- :heavy_multiplication_x: **Family Budgeting:** The system allows families to set monthly budgets for different expense and income categories, aiding in controlling overspending.
+- :heavy_check_mark: **Family Budgeting:** The system allows families to set monthly budgets for different expense categories, aiding in controlling overspending.
 
-- :heavy_multiplication_x: **Long-Term Financial Planning:** FamilyFunds offers advanced features for long-term financial planning, including savings goals, investments, and retirement planning.
+- :heavy_check_mark: **Financial Health Score:** A 0–100 score built from savings rate, emergency fund, credit card usage, card bill vs. income and budget adherence, with practical recommendations.
+
+- :heavy_check_mark: **Long-Term Financial Planning:** Savings goals and an investment portfolio (allocation, returns, liquidity) with investment insights.
 
 - :heavy_multiplication_x: **Family Activities:** In addition to financial management, the system enables families to plan and organize activities such as trips, special events, and family goals.
 
+## Project Structure
+
+```
+backend/   REST API — Node.js 22, Express 5, PostgreSQL (pg), JWT auth, zod validation
+app/       Mobile/web app — Flutter (Material 3, green & blue theme), provider, fl_chart
+```
+
 ## Prerequisites
+
+- Node.js 22+
+- PostgreSQL 16+ (or Docker: `docker compose up -d`)
+- Flutter 3.38+ (stable)
+
+## Getting Started
+
+### API
+
+```bash
+docker compose up -d            # starts PostgreSQL (skip if you already have one)
+cd backend
+cp .env.example .env
+npm install
+npm run migrate                 # creates the schema
+npm run seed                    # optional: demo family (demo@familyfunds.app / familia123)
+npm run dev                     # http://localhost:3000
+npm test                        # integration tests (uses the familyfunds_test database)
+```
+
+Main endpoints (all under `/api`, authenticated with `Authorization: Bearer <token>`):
+
+| Resource | Endpoints |
+|---|---|
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
+| Family members | `GET/POST /members`, `PATCH/DELETE /members/:id` |
+| Accounts & credit cards | `GET/POST /accounts`, `GET/PATCH/DELETE /accounts/:id` (balances, limit usage, current bill) |
+| Categories | `GET/POST /categories`, `PATCH/DELETE /categories/:id` |
+| Transactions | `GET /transactions?month=&type=&member_id=&account_id=&category_id=&search=`, `POST` (supports `installments`), `PATCH`, `DELETE ?scope=all` |
+| Budgets | `GET/POST /budgets`, `PATCH/DELETE /budgets/:id` |
+| Investments & goals | `/investments`, `/goals` (CRUD) |
+| Reports | `GET /reports/summary`, `/reports/cashflow`, `/reports/health`, `/reports/investments`, `/reports/dashboard` |
+
+### App
+
+```bash
+cd app
+flutter pub get
+flutter run -d chrome                                         # web
+flutter run --dart-define=API_URL=http://10.0.2.2:3000/api   # Android emulator
+flutter test
+```
 
 ## How to Contribute
 
@@ -44,12 +95,8 @@ If you wish to contribute to FamilyFunds, follow these steps:
 - [Node.js](https://nodejs.org/en/)
 - [PostgreSQL](https://www.postgresql.org/)
 - Integration: Azure DevOps, GitHub Actions
-- Hosting: XX
+- Hosting: TBD
 
 ## License
 
 This project is under the [Personal License](#license)
-
----
-
-This README.md provides an overview of the FamilyFunds project and how to contribute to it. Feel free to customize the sections as per your needs. Make sure to add appropriate links for the license, logo image, and any other relevant information.
