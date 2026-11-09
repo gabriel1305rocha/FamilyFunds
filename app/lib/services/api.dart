@@ -2,8 +2,21 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-/// URL da API. Altere com: flutter run --dart-define=API_URL=http://10.0.2.2:3000/api
+/// URL padrão da API. Altere com: flutter run --dart-define=API_URL=http://10.0.2.2:3000/api
+/// O usuário também pode trocar o servidor na tela de login.
 const apiUrl = String.fromEnvironment('API_URL', defaultValue: 'http://localhost:3000/api');
+
+/// Normaliza o endereço digitado: "192.168.0.10:3000" vira "http://192.168.0.10:3000/api".
+String normalizeApiUrl(String input) {
+  var url = input.trim();
+  if (url.isEmpty) return apiUrl;
+  if (!url.contains('://')) url = 'http://$url';
+  while (url.endsWith('/')) {
+    url = url.substring(0, url.length - 1);
+  }
+  if (!url.endsWith('/api')) url = '$url/api';
+  return url;
+}
 
 class ApiException implements Exception {
   ApiException(this.status, this.message);
@@ -18,7 +31,7 @@ class ApiClient {
   ApiClient({http.Client? client, this.baseUrl = apiUrl}) : _http = client ?? http.Client();
 
   final http.Client _http;
-  final String baseUrl;
+  String baseUrl;
   String? token;
 
   /// Chamado quando a API responde 401 (token expirado).

@@ -1,0 +1,138 @@
+name: Release Android
+
+# Disparo manual: Actions → "Release Android" → Run workflow.
+# Gera o APK e publica numa release do GitHub, pronto para baixar e instalar no celular.
+on:
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: 'Servidor padrão da API (pode ser trocado na tela de login do app). Ex.: http://192.168.0.10:3000/api'
+        required: false
+        default: ''
+      prerelease:
+        description: 'Marcar como pré-release (versão de teste)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-release
+  cancel-in-progress: false
+
+jobs:
+  apk:
+    name: Compilar e publicar APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.7
+          cache: true
+
+      - run: flutter pub get
+
+      - name: Testes
+        run: flutter test
+
+      - name: Configurar assinatura
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > android/app/release.jks
+            {
+              echo "storeFile=release.jks"
+              echo "storePassword=$KEYSTORE_PASSWORD"
+              echo "keyAlias=$KEY_ALIAS"
+              echo "keyPassword=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            } > android/key.properties
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Secrets de assinatura não configurados: o APK será assinado com a chave de debug."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compilar APK
+        env:
+          API_URL: ${{ inputs.api_url }}
+        run: |
+          args=(--release --build-number="${{ github.run_number }}")
+          if [ -n "$API_URL" ]; then args+=(--dart-define=API_URL="$API_URL"); fi
+          flutter build apk "${args[@]}"
+
+      - name: Preparar arquivos
+        id: files
+        run: |
+          version=$(grep '^version:' pubspec.yaml | sed -E 's/version: *([^+]+).*/\1/')
+          build="${{ github.run_number }}"
+          apk="family-funds-${version}-build${build}.apk"
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk "dist/$apk"
+          (cd dist && sha256sum "$apk" > "$apk.sha256")
+          {
+            echo "version=$version"
+            echo "build=$build"
+            echo "apk=$apk"
+            echo "tag=android-v${version}-build${build}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publicar release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.files.outputs.tag }}
+          VERSION: ${{ steps.files.outputs.version }}
+          BUILD: ${{ steps.files.outputs.build }}
+          APK: ${{ steps.files.outputs.apk }}
+          SIGNED: ${{ steps.signing.outputs.signed }}
+          API_URL: ${{ inputs.api_url }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          server="${API_URL:-não definido (configure na tela de login)}"
+          if [ "$SIGNED" = "true" ]; then
+            signing="Assinado com a chave de release do projeto: as próximas versões atualizam o app sem precisar desinstalar."
+          else
+            signing="Assinado com chave de debug (secrets de assinatura não configurados). Para instalar uma versão nova, desinstale a anterior antes."
+          fi
+          cat > notes.md <<EOF
+          ## Family Funds para Android — ${VERSION} (build ${BUILD})
+
+          ### Como instalar
+          1. No celular Android, baixe o arquivo **${APK}** abaixo, em *Assets*.
+          2. Abra o arquivo baixado. Se o Android pedir, permita **instalar apps desta fonte** (navegador ou gerenciador de arquivos).
+          3. Abra o **Family Funds**, toque em **Servidor** na tela de login e informe o endereço da sua API (ex.: \`192.168.0.10:3000\`).
+
+          ### Detalhes
+          - Servidor padrão desta build: ${server}
+          - ${signing}
+          - Commit: ${GITHUB_SHA}
+          - Verificação: compare o SHA-256 do APK com o arquivo \`${APK}.sha256\`.
+          EOF
+          flags=()
+          if [ "$PRERELEASE" = "true" ]; then flags+=(--prerelease); fi
+          gh release create "$TAG" "dist/$APK" "dist/$APK.sha256" \
+            --target "$GITHUB_SHA" \
+            --title "Family Funds Android ${VERSION} (build ${BUILD})" \
+            --notes-file notes.md \
+            "${flags[@]}"
+
+      - name: Resumo
+        run: |
+          echo "### APK publicado" >> "$GITHUB_STEP_SUMMARY"
+          echo "https://github.com/${{ github.repository }}/releases/tag/${{ steps.files.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"

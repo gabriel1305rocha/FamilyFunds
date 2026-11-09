@@ -1,8 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- O app conversa com a API do Family Funds pela rede. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- usesCleartextTraffic: permite http:// para a API rodando na rede de casa (ex.: http://192.168.0.10:3000).
+         Para acesso pela internet, use sempre https://. -->
     <application
-        android:label="family_funds"
+        android:label="Family Funds"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"
             android:exported="true"
