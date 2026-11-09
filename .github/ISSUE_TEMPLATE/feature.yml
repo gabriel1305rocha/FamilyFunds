@@ -1,0 +1,16 @@
+name: Ideia / nova funcionalidade
+description: Sugira algo para facilitar a vida financeira da família
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema isso resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Como você imagina a solução?
+    validations:
+      required: true

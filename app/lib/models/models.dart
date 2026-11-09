@@ -3,7 +3,15 @@ import '../utils/format.dart';
 typedef Json = Map<String, dynamic>;
 
 class Member {
-  Member({required this.id, required this.name, required this.color, required this.role, this.email, this.hasLogin = false, this.familyName});
+  Member({
+    required this.id,
+    required this.name,
+    required this.color,
+    required this.role,
+    this.email,
+    this.hasLogin = false,
+    this.familyName,
+  });
 
   final int id;
   final String name;
@@ -16,14 +24,14 @@ class Member {
   bool get isOwner => role == 'owner';
 
   factory Member.fromJson(Json j) => Member(
-        id: j['id'],
-        name: j['name'],
-        color: j['color'] ?? '#1E88E5',
-        role: j['role'] ?? 'member',
-        email: j['email'],
-        hasLogin: j['has_login'] ?? false,
-        familyName: j['family_name'],
-      );
+    id: j['id'],
+    name: j['name'],
+    color: j['color'] ?? '#1E88E5',
+    role: j['role'] ?? 'member',
+    email: j['email'],
+    hasLogin: j['has_login'] ?? false,
+    familyName: j['family_name'],
+  );
 }
 
 enum AccountType {
@@ -76,25 +84,32 @@ class Account {
   bool get isCard => type == AccountType.creditCard;
 
   factory Account.fromJson(Json j) => Account(
-        id: j['id'],
-        name: j['name'],
-        type: AccountType.parse(j['type']),
-        balance: toDouble(j['balance']),
-        color: j['color'] ?? '#00A86B',
-        ownerId: j['owner_id'],
-        institution: j['institution'],
-        creditLimit: j['credit_limit'] == null ? null : toDouble(j['credit_limit']),
-        closingDay: j['closing_day'],
-        dueDay: j['due_day'],
-        usedLimit: j['used_limit'] == null ? null : toDouble(j['used_limit']),
-        availableLimit: j['available_limit'] == null ? null : toDouble(j['available_limit']),
-        utilization: j['utilization'] == null ? null : toDouble(j['utilization']),
-        currentBill: j['current_bill'] == null ? null : toDouble(j['current_bill']['total']),
-      );
+    id: j['id'],
+    name: j['name'],
+    type: AccountType.parse(j['type']),
+    balance: toDouble(j['balance']),
+    color: j['color'] ?? '#00A86B',
+    ownerId: j['owner_id'],
+    institution: j['institution'],
+    creditLimit: j['credit_limit'] == null ? null : toDouble(j['credit_limit']),
+    closingDay: j['closing_day'],
+    dueDay: j['due_day'],
+    usedLimit: j['used_limit'] == null ? null : toDouble(j['used_limit']),
+    availableLimit: j['available_limit'] == null ? null : toDouble(j['available_limit']),
+    utilization: j['utilization'] == null ? null : toDouble(j['utilization']),
+    currentBill: j['current_bill'] == null ? null : toDouble(j['current_bill']['total']),
+  );
 }
 
 class Category {
-  Category({required this.id, required this.name, required this.kind, required this.icon, required this.color, this.essential = false});
+  Category({
+    required this.id,
+    required this.name,
+    required this.kind,
+    required this.icon,
+    required this.color,
+    this.essential = false,
+  });
 
   final int id;
   final String name;
@@ -104,13 +119,13 @@ class Category {
   final bool essential;
 
   factory Category.fromJson(Json j) => Category(
-        id: j['id'],
-        name: j['name'],
-        kind: j['kind'],
-        icon: j['icon'] ?? 'category',
-        color: j['color'] ?? '#26A69A',
-        essential: j['essential'] ?? false,
-      );
+    id: j['id'],
+    name: j['name'],
+    kind: j['kind'],
+    icon: j['icon'] ?? 'category',
+    color: j['color'] ?? '#26A69A',
+    essential: j['essential'] ?? false,
+  );
 }
 
 class Txn {
@@ -151,23 +166,23 @@ class Txn {
   final int? installmentTotal;
 
   factory Txn.fromJson(Json j) => Txn(
-        id: j['id'],
-        type: j['type'],
-        amount: toDouble(j['amount']),
-        description: j['description'] ?? '',
-        date: j['date'],
-        accountId: j['account_id'],
-        accountName: j['account_name'] ?? '',
-        transferAccountName: j['transfer_account_name'],
-        categoryId: j['category_id'],
-        categoryName: j['category_name'],
-        categoryIcon: j['category_icon'],
-        categoryColor: j['category_color'],
-        memberId: j['member_id'],
-        memberName: j['member_name'],
-        memberColor: j['member_color'],
-        installmentTotal: j['installment_total'],
-      );
+    id: j['id'],
+    type: j['type'],
+    amount: toDouble(j['amount']),
+    description: j['description'] ?? '',
+    date: j['date'],
+    accountId: j['account_id'],
+    accountName: j['account_name'] ?? '',
+    transferAccountName: j['transfer_account_name'],
+    categoryId: j['category_id'],
+    categoryName: j['category_name'],
+    categoryIcon: j['category_icon'],
+    categoryColor: j['category_color'],
+    memberId: j['member_id'],
+    memberName: j['member_name'],
+    memberColor: j['member_color'],
+    installmentTotal: j['installment_total'],
+  );
 }
 
 class Investment {
@@ -205,26 +220,29 @@ class Investment {
     'other': 'Outros',
   };
 
-  static const liquidities = {
-    'daily': 'Liquidez diária',
-    'monthly': 'Liquidez mensal',
-    'maturity': 'No vencimento',
-  };
+  static const liquidities = {'daily': 'Liquidez diária', 'monthly': 'Liquidez mensal', 'maturity': 'No vencimento'};
 
   factory Investment.fromJson(Json j) => Investment(
-        id: j['id'],
-        name: j['name'],
-        type: j['type'],
-        invested: toDouble(j['invested_amount']),
-        current: toDouble(j['current_value']),
-        liquidity: j['liquidity'],
-        institution: j['institution'],
-        memberId: j['member_id'],
-      );
+    id: j['id'],
+    name: j['name'],
+    type: j['type'],
+    invested: toDouble(j['invested_amount']),
+    current: toDouble(j['current_value']),
+    liquidity: j['liquidity'],
+    institution: j['institution'],
+    memberId: j['member_id'],
+  );
 }
 
 class Goal {
-  Goal({required this.id, required this.name, required this.target, required this.current, required this.color, this.deadline});
+  Goal({
+    required this.id,
+    required this.name,
+    required this.target,
+    required this.current,
+    required this.color,
+    this.deadline,
+  });
 
   final int id;
   final String name;
@@ -236,11 +254,11 @@ class Goal {
   double get progress => target > 0 ? (current / target).clamp(0, 1).toDouble() : 0;
 
   factory Goal.fromJson(Json j) => Goal(
-        id: j['id'],
-        name: j['name'],
-        target: toDouble(j['target_amount']),
-        current: toDouble(j['current_amount']),
-        color: j['color'] ?? '#1E88E5',
-        deadline: j['deadline'],
-      );
+    id: j['id'],
+    name: j['name'],
+    target: toDouble(j['target_amount']),
+    current: toDouble(j['current_amount']),
+    color: j['color'] ?? '#1E88E5',
+    deadline: j['deadline'],
+  );
 }

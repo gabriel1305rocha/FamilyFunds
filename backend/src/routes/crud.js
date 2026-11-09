@@ -20,7 +20,9 @@ export function crudRouter({ table, schema, refs = {}, orderBy = 'id', list, bef
 
   router.get('/', async (req, res) => {
     if (list) return res.json(await list(req));
-    const { rows } = await query(`SELECT * FROM ${table} WHERE family_id = $1 ORDER BY ${orderBy}`, [req.user.familyId]);
+    const { rows } = await query(`SELECT * FROM ${table} WHERE family_id = $1 ORDER BY ${orderBy}`, [
+      req.user.familyId,
+    ]);
     res.json(rows);
   });
 

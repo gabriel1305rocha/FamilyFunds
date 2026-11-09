@@ -46,8 +46,18 @@ class AppState extends ChangeNotifier {
     await _startSession(res['token']);
   }
 
-  Future<void> register({required String familyName, required String name, required String email, required String password}) async {
-    final res = await api.post('/auth/register', {'familyName': familyName, 'name': name, 'email': email, 'password': password});
+  Future<void> register({
+    required String familyName,
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final res = await api.post('/auth/register', {
+      'familyName': familyName,
+      'name': name,
+      'email': email,
+      'password': password,
+    });
     await _startSession(res['token']);
   }
 

@@ -37,8 +37,16 @@ class MembersScreen extends StatelessWidget {
                 for (final m in state.members)
                   ListTile(
                     leading: MemberAvatar(name: m.name, color: m.color, radius: 20),
-                    title: Text(m.name + (m.id == state.me?.id ? ' (você)' : ''), style: const TextStyle(fontWeight: FontWeight.w600)),
-                    subtitle: Text([m.isOwner ? 'Responsável' : 'Membro', m.hasLogin ? m.email : 'Sem acesso ao app'].whereType<String>().join(' · ')),
+                    title: Text(
+                      m.name + (m.id == state.me?.id ? ' (você)' : ''),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: Text(
+                      [
+                        m.isOwner ? 'Responsável' : 'Membro',
+                        m.hasLogin ? m.email : 'Sem acesso ao app',
+                      ].whereType<String>().join(' · '),
+                    ),
                     trailing: (isOwner || m.id == state.me?.id) ? const Icon(Icons.edit_outlined) : null,
                     onTap: (isOwner || m.id == state.me?.id) ? () => _showMemberForm(context, member: m) : null,
                   ),
@@ -103,7 +111,9 @@ class _MemberFormState extends State<_MemberForm> {
   }
 
   Future<void> _delete() async {
-    if (!await confirm(context, 'Remover ${widget.member!.name} da família? Os lançamentos ficarão como "Família".')) return;
+    if (!await confirm(context, 'Remover ${widget.member!.name} da família? Os lançamentos ficarão como "Família".')) {
+      return;
+    }
     try {
       await state.api.delete('/members/${widget.member!.id}');
       await state.dataChanged();
@@ -129,10 +139,17 @@ class _MemberFormState extends State<_MemberForm> {
               Row(
                 children: [
                   Expanded(
-                    child: Text(editing ? 'Editar membro' : 'Novo membro',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                    child: Text(
+                      editing ? 'Editar membro' : 'Novo membro',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                    ),
                   ),
-                  if (canDelete) IconButton(tooltip: 'Remover', onPressed: _delete, icon: const Icon(Icons.delete_outline, color: FFColors.danger)),
+                  if (canDelete)
+                    IconButton(
+                      tooltip: 'Remover',
+                      onPressed: _delete,
+                      icon: const Icon(Icons.delete_outline, color: FFColors.danger),
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -142,9 +159,16 @@ class _MemberFormState extends State<_MemberForm> {
                 validator: (v) => (v ?? '').trim().isEmpty ? 'Informe o nome' : null,
               ),
               const SizedBox(height: 12),
-              Text('Opcional: dê acesso ao app com e-mail e senha.', style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13)),
+              Text(
+                'Opcional: dê acesso ao app com e-mail e senha.',
+                style: TextStyle(color: Theme.of(context).hintColor, fontSize: 13),
+              ),
               const SizedBox(height: 8),
-              TextFormField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'E-mail')),
+              TextFormField(
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'E-mail'),
+              ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _password,
@@ -162,13 +186,18 @@ class _MemberFormState extends State<_MemberForm> {
                       child: CircleAvatar(
                         radius: 16,
                         backgroundColor: c,
-                        child: _color.toARGB32() == c.toARGB32() ? const Icon(Icons.check, color: Colors.white, size: 18) : null,
+                        child: _color.toARGB32() == c.toARGB32()
+                            ? const Icon(Icons.check, color: Colors.white, size: 18)
+                            : null,
                       ),
                     ),
                 ],
               ),
               const SizedBox(height: 20),
-              FilledButton(onPressed: _saving ? null : _save, child: _saving ? const CircularProgressIndicator(strokeWidth: 2) : const Text('Salvar')),
+              FilledButton(
+                onPressed: _saving ? null : _save,
+                child: _saving ? const CircularProgressIndicator(strokeWidth: 2) : const Text('Salvar'),
+              ),
             ],
           ),
         ),

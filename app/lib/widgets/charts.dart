@@ -12,7 +12,10 @@ class CashflowChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final maxY = data.fold<double>(0, (m, e) => [m, toDouble(e['income']), toDouble(e['expense'])].reduce((a, b) => a > b ? a : b));
+    final maxY = data.fold<double>(
+      0,
+      (m, e) => [m, toDouble(e['income']), toDouble(e['expense'])].reduce((a, b) => a > b ? a : b),
+    );
     final muted = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
     return Column(
       children: [
@@ -63,8 +66,18 @@ class CashflowChart extends StatelessWidget {
                     x: i,
                     barsSpace: 4,
                     barRods: [
-                      BarChartRodData(toY: toDouble(data[i]['income']), color: FFColors.income, width: 10, borderRadius: BorderRadius.circular(4)),
-                      BarChartRodData(toY: toDouble(data[i]['expense']), color: FFColors.expense, width: 10, borderRadius: BorderRadius.circular(4)),
+                      BarChartRodData(
+                        toY: toDouble(data[i]['income']),
+                        color: FFColors.income,
+                        width: 10,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      BarChartRodData(
+                        toY: toDouble(data[i]['expense']),
+                        color: FFColors.expense,
+                        width: 10,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ],
                   ),
               ],
@@ -96,7 +109,11 @@ class LegendDot extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 10, height: 10, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 6),
         Text(label, style: const TextStyle(fontSize: 12)),
       ],
@@ -153,15 +170,27 @@ class DonutChart extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 3),
                   child: Row(
                     children: [
-                      Container(width: 10, height: 10, decoration: BoxDecoration(color: s.color, shape: BoxShape.circle)),
+                      Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(color: s.color, shape: BoxShape.circle),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: Text(s.label, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13))),
-                      Text(percent(total > 0 ? s.value / total : 0), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                      Expanded(
+                        child: Text(s.label, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
+                      ),
+                      Text(
+                        percent(total > 0 ? s.value / total : 0),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
                     ],
                   ),
                 ),
               if (slices.length > 6)
-                Text('+ ${slices.length - 6} outras', style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor)),
+                Text(
+                  '+ ${slices.length - 6} outras',
+                  style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+                ),
             ],
           ),
         ),
@@ -206,8 +235,18 @@ class ScoreGauge extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(score?.toString() ?? '--', style: TextStyle(fontSize: size * 0.3, fontWeight: FontWeight.w800, color: light ? Colors.white : null)),
-                Text('de 100', style: TextStyle(fontSize: size * 0.09, color: light ? Colors.white70 : Theme.of(context).hintColor)),
+                Text(
+                  score?.toString() ?? '--',
+                  style: TextStyle(
+                    fontSize: size * 0.3,
+                    fontWeight: FontWeight.w800,
+                    color: light ? Colors.white : null,
+                  ),
+                ),
+                Text(
+                  'de 100',
+                  style: TextStyle(fontSize: size * 0.09, color: light ? Colors.white70 : Theme.of(context).hintColor),
+                ),
               ],
             ),
           ),

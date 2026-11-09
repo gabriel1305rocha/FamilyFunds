@@ -25,16 +25,17 @@ class ApiClient {
   void Function()? onUnauthorized;
 
   Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
+    'Content-Type': 'application/json',
+    if (token != null) 'Authorization': 'Bearer $token',
+  };
 
   Uri _uri(String path, [Map<String, dynamic>? query]) {
     final q = query?..removeWhere((_, v) => v == null);
     return Uri.parse('$baseUrl$path').replace(queryParameters: q?.map((k, v) => MapEntry(k, '$v')));
   }
 
-  Future<dynamic> get(String path, [Map<String, dynamic>? query]) => _send(() => _http.get(_uri(path, query), headers: _headers));
+  Future<dynamic> get(String path, [Map<String, dynamic>? query]) =>
+      _send(() => _http.get(_uri(path, query), headers: _headers));
 
   Future<dynamic> post(String path, Object body) =>
       _send(() => _http.post(_uri(path), headers: _headers, body: jsonEncode(body)));

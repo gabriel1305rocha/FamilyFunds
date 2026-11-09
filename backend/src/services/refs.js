@@ -1,6 +1,14 @@
 import { HttpError } from '../middleware/errors.js';
 
-const ALLOWED_TABLES = new Set(['members', 'accounts', 'categories', 'investments', 'goals', 'budgets', 'transactions']);
+const ALLOWED_TABLES = new Set([
+  'members',
+  'accounts',
+  'categories',
+  'investments',
+  'goals',
+  'budgets',
+  'transactions',
+]);
 
 /**
  * Garante que os IDs referenciados pertencem à família do usuário,

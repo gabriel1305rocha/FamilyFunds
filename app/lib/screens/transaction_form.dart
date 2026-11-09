@@ -36,7 +36,9 @@ class _TransactionFormState extends State<TransactionForm> {
   final _form = GlobalKey<FormState>();
   late final AppState state = context.read<AppState>();
   late String _type = widget.txn?.type ?? 'expense';
-  late final _amount = TextEditingController(text: widget.txn == null ? '' : widget.txn!.amount.toStringAsFixed(2).replaceAll('.', ','));
+  late final _amount = TextEditingController(
+    text: widget.txn == null ? '' : widget.txn!.amount.toStringAsFixed(2).replaceAll('.', ','),
+  );
   late final _description = TextEditingController(text: widget.txn?.description ?? '');
   late DateTime _date = widget.txn == null ? DateTime.now() : DateTime.parse(widget.txn!.date);
   late int? _accountId = widget.txn?.accountId ?? state.accounts.first.id;
@@ -82,7 +84,11 @@ class _TransactionFormState extends State<TransactionForm> {
   @override
   Widget build(BuildContext context) {
     final selectedAccount = state.accountById(_accountId);
-    final color = switch (_type) { 'income' => FFColors.income, 'expense' => FFColors.expense, _ => FFColors.teal };
+    final color = switch (_type) {
+      'income' => FFColors.income,
+      'expense' => FFColors.expense,
+      _ => FFColors.teal,
+    };
 
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
@@ -93,7 +99,10 @@ class _TransactionFormState extends State<TransactionForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(_editing ? 'Editar lançamento' : 'Novo lançamento', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+              Text(
+                _editing ? 'Editar lançamento' : 'Novo lançamento',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+              ),
               const SizedBox(height: 16),
               SegmentedButton<String>(
                 segments: const [
@@ -130,7 +139,10 @@ class _TransactionFormState extends State<TransactionForm> {
                   labelText: _type == 'transfer' ? 'Da conta' : 'Conta / cartão',
                   prefixIcon: Icon(selectedAccount?.isCard == true ? Icons.credit_card : Icons.account_balance),
                 ),
-                items: [for (final a in state.accounts) DropdownMenuItem(value: a.id, child: Text('${a.name} · ${a.type.label}'))],
+                items: [
+                  for (final a in state.accounts)
+                    DropdownMenuItem(value: a.id, child: Text('${a.name} · ${a.type.label}')),
+                ],
                 onChanged: (v) => setState(() => _accountId = v),
               ),
               if (_type == 'transfer') ...[
@@ -138,7 +150,10 @@ class _TransactionFormState extends State<TransactionForm> {
                 DropdownButtonFormField<int>(
                   initialValue: _transferAccountId,
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Para a conta (ex.: pagar fatura)', prefixIcon: Icon(Icons.call_made)),
+                  decoration: const InputDecoration(
+                    labelText: 'Para a conta (ex.: pagar fatura)',
+                    prefixIcon: Icon(Icons.call_made),
+                  ),
                   items: [
                     for (final a in state.accounts.where((a) => a.id != _accountId))
                       DropdownMenuItem(value: a.id, child: Text('${a.name} · ${a.type.label}')),
@@ -157,7 +172,13 @@ class _TransactionFormState extends State<TransactionForm> {
                     for (final c in _categories)
                       DropdownMenuItem(
                         value: c.id,
-                        child: Row(children: [Icon(categoryIcon(c.icon), size: 18, color: hexColor(c.color)), const SizedBox(width: 8), Text(c.name)]),
+                        child: Row(
+                          children: [
+                            Icon(categoryIcon(c.icon), size: 18, color: hexColor(c.color)),
+                            const SizedBox(width: 8),
+                            Text(c.name),
+                          ],
+                        ),
                       ),
                   ],
                   onChanged: (v) => setState(() => _categoryId = v),
@@ -183,7 +204,12 @@ class _TransactionFormState extends State<TransactionForm> {
                       icon: const Icon(Icons.event),
                       label: Text(shortDate(isoDate(_date))),
                       onPressed: () async {
-                        final d = await showDatePicker(context: context, initialDate: _date, firstDate: DateTime(2000), lastDate: DateTime(2100));
+                        final d = await showDatePicker(
+                          context: context,
+                          initialDate: _date,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2100),
+                        );
                         if (d != null) setState(() => _date = d);
                       },
                     ),
@@ -194,7 +220,10 @@ class _TransactionFormState extends State<TransactionForm> {
                       child: DropdownButtonFormField<int>(
                         initialValue: _installments,
                         decoration: const InputDecoration(labelText: 'Parcelas'),
-                        items: [for (var i = 1; i <= 24; i++) DropdownMenuItem(value: i, child: Text(i == 1 ? 'À vista' : '${i}x'))],
+                        items: [
+                          for (var i = 1; i <= 24; i++)
+                            DropdownMenuItem(value: i, child: Text(i == 1 ? 'À vista' : '${i}x')),
+                        ],
                         onChanged: (v) => setState(() => _installments = v ?? 1),
                       ),
                     ),
@@ -205,7 +234,9 @@ class _TransactionFormState extends State<TransactionForm> {
               FilledButton(
                 onPressed: _saving ? null : _save,
                 style: FilledButton.styleFrom(backgroundColor: color),
-                child: _saving ? const CircularProgressIndicator(strokeWidth: 2) : Text(_editing ? 'Salvar alterações' : 'Adicionar'),
+                child: _saving
+                    ? const CircularProgressIndicator(strokeWidth: 2)
+                    : Text(_editing ? 'Salvar alterações' : 'Adicionar'),
               ),
             ],
           ),

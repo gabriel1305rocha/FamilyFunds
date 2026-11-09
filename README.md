@@ -1,102 +1,126 @@
-# FamilyFunds - Finance and Family Activities Management System
-<h4 align="center"> 
-	🚧  🚀 Under construction...  🚧
-</h4>
+<h1 align="center">Family Funds</h1>
 
-FamilyFunds is a finance and family activities management system designed to help families control their expenses, save, and plan effectively. The system offers an intuitive interface that enables users to track their finances and also keep track of their family activities.
+<p align="center">
+  <strong>O controle financeiro da sua família, em um app feito para usar em casa.</strong><br>
+  Quanto a família ganha, quanto gasta, quem gastou, como está o cartão e se a saúde financeira vai bem.
+</p>
 
+<p align="center">
+  <a href="https://github.com/gabriel1305rocha/FamilyFunds/actions/workflows/ci.yml"><img src="https://github.com/gabriel1305rocha/FamilyFunds/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/gabriel1305rocha/FamilyFunds/actions/workflows/codeql.yml"><img src="https://github.com/gabriel1305rocha/FamilyFunds/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <img src="https://img.shields.io/badge/Flutter-3.47-02569B?logo=flutter" alt="Flutter">
+  <img src="https://img.shields.io/badge/Node.js-22-339933?logo=node.js" alt="Node.js">
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql" alt="PostgreSQL">
+</p>
 
-## Key Features
+<p align="center">
+  <img src="docs/screenshots.png" alt="Telas do Family Funds: início, contas e cartões, saúde financeira e investimentos" width="900">
+</p>
 
-- :heavy_check_mark: **Expense and Income Tracking:** Users can easily input their expenses and income, categorize them, and keep track of their cash flows — per family member (e.g. you and your spouse), per checking account and per credit card (with installments, bill cycle and limit usage).
+## Funcionalidades
 
-- :heavy_check_mark: **Family Budgeting:** The system allows families to set monthly budgets for different expense categories, aiding in controlling overspending.
+- **Ganhos x gastos:** resumo do mês com taxa de poupança, gráfico dos últimos 6 meses e gastos por categoria.
+- **A família toda:** cada membro (você, sua esposa, os filhos) tem seus lançamentos, contas e cartões. O painel mostra quem ganhou e quem gastou quanto.
+- **Conta corrente e cartão de crédito:** saldo das contas, fatura atual pelo dia de fechamento, limite usado e disponível, compras parceladas e pagamento de fatura como transferência.
+- **Orçamento:** limite mensal por categoria, com alerta quando estoura.
+- **Saúde financeira de 0 a 100:** combina taxa de poupança, reserva de emergência, uso do limite do cartão, peso da fatura na renda e orçamento, com recomendações práticas.
+- **Investimentos e metas:** carteira com alocação, rentabilidade e liquidez, insights (reserva antes de renda variável, diversificação, exposição a cripto) e metas com o valor a guardar por mês.
+- **Privado por padrão:** seus dados ficam no seu servidor. Cada família só enxerga os próprios dados.
 
-- :heavy_check_mark: **Financial Health Score:** A 0–100 score built from savings rate, emergency fund, credit card usage, card bill vs. income and budget adherence, with practical recommendations.
-
-- :heavy_check_mark: **Long-Term Financial Planning:** Savings goals and an investment portfolio (allocation, returns, liquidity) with investment insights.
-
-- :heavy_multiplication_x: **Family Activities:** In addition to financial management, the system enables families to plan and organize activities such as trips, special events, and family goals.
-
-## Project Structure
+## Como funciona
 
 ```
-backend/   REST API — Node.js 22, Express 5, PostgreSQL (pg), JWT auth, zod validation
-app/       Mobile/web app — Flutter (Material 3, green & blue theme), provider, fl_chart
+app/       App Flutter (Android, iOS e web) — Material 3 em verde e azul
+backend/   API REST — Node.js 22, Express 5, PostgreSQL 16, JWT, validação com zod
+docs/      Imagens e documentação
 ```
 
-## Prerequisites
+O app conversa com a API, e a API guarda tudo no PostgreSQL. Para uso em casa, a API e o banco rodam juntos via Docker em qualquer computador sempre ligado (mini PC, NAS, Raspberry Pi ou um servidor na nuvem).
 
-- Node.js 22+
-- PostgreSQL 16+ (or Docker: `docker compose up -d`)
-- Flutter 3.38+ (stable)
+## Começando
 
-## Getting Started
+### Pré-requisitos
 
-### API
+- [Docker](https://docs.docker.com/get-docker/) (ou PostgreSQL 16+ instalado)
+- [Node.js](https://nodejs.org/) 22+
+- [Flutter](https://docs.flutter.dev/get-started/install) 3.47+ (canal stable)
+
+### Desenvolvimento
 
 ```bash
-docker compose up -d            # starts PostgreSQL (skip if you already have one)
+# 1. Banco de dados
+docker compose up -d postgres
+
+# 2. API
 cd backend
 cp .env.example .env
 npm install
-npm run migrate                 # creates the schema
-npm run seed                    # optional: demo family (demo@familyfunds.app / familia123)
-npm run dev                     # http://localhost:3000
-npm test                        # integration tests (uses the familyfunds_test database)
-```
+npm run migrate          # cria as tabelas
+npm run seed             # opcional: família demo (demo@familyfunds.app / familia123)
+npm run dev              # http://localhost:3000
 
-Main endpoints (all under `/api`, authenticated with `Authorization: Bearer <token>`):
-
-| Resource | Endpoints |
-|---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
-| Family members | `GET/POST /members`, `PATCH/DELETE /members/:id` |
-| Accounts & credit cards | `GET/POST /accounts`, `GET/PATCH/DELETE /accounts/:id` (balances, limit usage, current bill) |
-| Categories | `GET/POST /categories`, `PATCH/DELETE /categories/:id` |
-| Transactions | `GET /transactions?month=&type=&member_id=&account_id=&category_id=&search=`, `POST` (supports `installments`), `PATCH`, `DELETE ?scope=all` |
-| Budgets | `GET/POST /budgets`, `PATCH/DELETE /budgets/:id` |
-| Investments & goals | `/investments`, `/goals` (CRUD) |
-| Reports | `GET /reports/summary`, `/reports/cashflow`, `/reports/health`, `/reports/investments`, `/reports/dashboard` |
-
-### App
-
-```bash
+# 3. App (em outro terminal)
 cd app
 flutter pub get
 flutter run -d chrome                                         # web
-flutter run --dart-define=API_URL=http://10.0.2.2:3000/api   # Android emulator
-flutter test
+flutter run --dart-define=API_URL=http://10.0.2.2:3000/api   # emulador Android
 ```
 
-## How to Contribute
+### Uso em casa (API + banco com Docker)
 
-If you wish to contribute to FamilyFunds, follow these steps:
+```bash
+# Na raiz do projeto, crie um .env com um segredo forte (pelo menos 32 caracteres):
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
+echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)" >> .env
 
-1. clone this repository.
+docker compose --profile full up -d --build
+```
 
-2. Create a new branch for your changes:
-      `git checkout -b feature/your-new-feature`
-   or `git checkout -b bugfix/your-bugfix`
-   or `git checkout -b refactor/your-refactor`
+Depois, gere o app apontando para o endereço do servidor, por exemplo:
 
-4. Make desired changes and commit them using good message commits:
-   `git commit -m 'Update {your feature description}'`
-   or `git commit -m 'BugFix {your bug description}'`
-   or `git commit -m 'Refactor {your refactor description}'`
+```bash
+flutter build apk --dart-define=API_URL=http://192.168.0.10:3000/api
+```
 
-6. Push to the branch: `git push origin your-branch`.
+> Para acessar fora de casa, coloque a API atrás de HTTPS (Caddy, Nginx ou um túnel como Tailscale/Cloudflare Tunnel). Veja [SECURITY.md](SECURITY.md).
 
-7. Submit a pull request indicating your changes.
+## Testes e qualidade
 
-## Technologies Used
+| Onde | Comando |
+|---|---|
+| API | `npm run lint`, `npm run format:check`, `npm test` (usa o banco `familyfunds_test`) |
+| App | `dart format --set-exit-if-changed lib test`, `flutter analyze`, `flutter test` |
 
-- [Flutter](https://flutter.dev/)
-- [Node.js](https://nodejs.org/en/)
-- [PostgreSQL](https://www.postgresql.org/)
-- Integration: Azure DevOps, GitHub Actions
-- Hosting: TBD
+O GitHub Actions roda tudo isso em cada pull request, além de compilar o app web e a imagem Docker da API. O CodeQL faz análise de segurança, e o Dependabot mantém as dependências atualizadas.
 
-## License
+## API
 
-This project is under the [Personal License](#license)
+Todas as rotas ficam em `/api` e, exceto as de autenticação, exigem `Authorization: Bearer <token>`.
+
+| Recurso | Rotas |
+|---|---|
+| Autenticação | `POST /auth/register`, `POST /auth/login`, `GET /auth/me` |
+| Membros | `GET/POST /members`, `PATCH/DELETE /members/:id` |
+| Contas e cartões | `GET/POST /accounts`, `GET/PATCH/DELETE /accounts/:id` (saldo, limite usado, fatura atual) |
+| Categorias | `GET/POST /categories`, `PATCH/DELETE /categories/:id` |
+| Lançamentos | `GET /transactions?month=&type=&member_id=&account_id=&category_id=&search=`, `POST` (aceita `installments`), `PATCH`, `DELETE ?scope=all` |
+| Orçamentos | `GET/POST /budgets`, `PATCH/DELETE /budgets/:id` |
+| Investimentos e metas | `/investments`, `/goals` (CRUD) |
+| Relatórios | `GET /reports/summary`, `/reports/cashflow`, `/reports/health`, `/reports/investments`, `/reports/dashboard` |
+| Saúde do serviço | `GET /health` (fora de `/api`, verifica o banco) |
+
+## Roadmap
+
+- [ ] Importar extratos bancários (OFX/CSV)
+- [ ] Lançamentos recorrentes (aluguel, assinaturas, salário)
+- [ ] Atividades da família: viagens, eventos e objetivos compartilhados
+- [ ] Notificações de vencimento de fatura e orçamento estourado
+- [ ] Exportar relatórios em PDF/planilha
+
+## Contribuindo
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md). Para relatar uma vulnerabilidade, siga o [SECURITY.md](SECURITY.md).
+
+## Licença
+
+Uso pessoal e não comercial. Veja [LICENSE](LICENSE).

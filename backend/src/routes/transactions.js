@@ -10,7 +10,12 @@ import { idParam } from './crud.js';
 
 const router = Router();
 
-const REFS = { account_id: 'accounts', transfer_account_id: 'accounts', member_id: 'members', category_id: 'categories' };
+const REFS = {
+  account_id: 'accounts',
+  transfer_account_id: 'accounts',
+  member_id: 'members',
+  category_id: 'categories',
+};
 
 const baseSchema = z.object({
   type: z.enum(['income', 'expense', 'transfer']),
@@ -39,7 +44,10 @@ const createSchema = baseSchema
   });
 
 const listSchema = z.object({
-  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).optional(),
+  month: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+    .optional(),
   from: z.iso.date().optional(),
   to: z.iso.date().optional(),
   type: z.enum(['income', 'expense', 'transfer']).optional(),
@@ -126,15 +134,25 @@ router.post('/', async (req, res) => {
     const out = [];
     for (let i = 0; i < installments; i++) {
       const value = (i === 0 ? cents - base * (installments - 1) : base) / 100;
-      const description = installments > 1 ? `${data.description ?? ''} (${i + 1}/${installments})`.trim() : data.description ?? '';
+      const description =
+        installments > 1 ? `${data.description ?? ''} (${i + 1}/${installments})`.trim() : (data.description ?? '');
       const { rows } = await db.query(
         `INSERT INTO transactions (family_id, account_id, member_id, category_id, type, amount, description, date,
                                    transfer_account_id, installment_number, installment_total, installment_group)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`,
         [
-          familyId, data.account_id, memberId, data.category_id ?? null, data.type, round(value), description,
-          addMonthsToDate(data.date, i), data.transfer_account_id ?? null,
-          group ? i + 1 : null, group ? installments : null, group,
+          familyId,
+          data.account_id,
+          memberId,
+          data.category_id ?? null,
+          data.type,
+          round(value),
+          description,
+          addMonthsToDate(data.date, i),
+          data.transfer_account_id ?? null,
+          group ? i + 1 : null,
+          group ? installments : null,
+          group,
         ],
       );
       out.push(rows[0]);
@@ -165,8 +183,18 @@ router.patch('/:id', async (req, res) => {
         SET type = $3, account_id = $4, transfer_account_id = $5, member_id = $6, category_id = $7,
             amount = $8, description = $9, date = $10
       WHERE id = $1 AND family_id = $2 RETURNING *`,
-    [id, familyId, merged.type, merged.account_id, merged.transfer_account_id, merged.member_id,
-      merged.category_id, merged.amount, merged.description, merged.date],
+    [
+      id,
+      familyId,
+      merged.type,
+      merged.account_id,
+      merged.transfer_account_id,
+      merged.member_id,
+      merged.category_id,
+      merged.amount,
+      merged.description,
+      merged.date,
+    ],
   );
   res.json(rows[0]);
 });
@@ -175,10 +203,16 @@ router.patch('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   const id = idParam.parse(req.params.id);
   const familyId = req.user.familyId;
-  const { rows } = await query('SELECT installment_group FROM transactions WHERE id = $1 AND family_id = $2', [id, familyId]);
+  const { rows } = await query('SELECT installment_group FROM transactions WHERE id = $1 AND family_id = $2', [
+    id,
+    familyId,
+  ]);
   if (!rows.length) throw new HttpError(404, 'Lançamento não encontrado');
   if (req.query.scope === 'all' && rows[0].installment_group) {
-    await query('DELETE FROM transactions WHERE installment_group = $1 AND family_id = $2', [rows[0].installment_group, familyId]);
+    await query('DELETE FROM transactions WHERE installment_group = $1 AND family_id = $2', [
+      rows[0].installment_group,
+      familyId,
+    ]);
   } else {
     await query('DELETE FROM transactions WHERE id = $1 AND family_id = $2', [id, familyId]);
   }

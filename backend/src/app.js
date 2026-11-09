@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { config } from './config.js';
+import { query } from './db/pool.js';
 import { requireAuth } from './middleware/auth.js';
 import { errorHandler, notFound } from './middleware/errors.js';
 import authRouter from './routes/auth.js';
@@ -11,13 +14,33 @@ import { accountsRouter, budgetsRouter, categoriesRouter, goalsRouter, investmen
 
 export function createApp() {
   const app = express();
+
+  app.set('trust proxy', config.trustProxy);
   app.use(helmet());
-  app.use(cors());
+  app.use(cors({ origin: config.corsOrigin }));
   app.use(express.json({ limit: '1mb' }));
 
-  app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+  app.get('/health', async (_req, res) => {
+    try {
+      await query('SELECT 1');
+      res.json({ status: 'ok', database: 'ok' });
+    } catch {
+      res.status(503).json({ status: 'error', database: 'unavailable' });
+    }
+  });
+
+  // Limita tentativas de login/cadastro para dificultar ataques de força bruta.
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: config.authRateLimit,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.' },
+  });
 
   const api = express.Router();
+  api.use('/auth/login', authLimiter);
+  api.use('/auth/register', authLimiter);
   api.use('/auth', authRouter);
   api.use(requireAuth);
   api.use('/members', membersRouter);

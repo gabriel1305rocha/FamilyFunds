@@ -38,10 +38,7 @@ class FFColors {
 
 ThemeData buildTheme(Brightness brightness) {
   final isDark = brightness == Brightness.dark;
-  final scheme = ColorScheme.fromSeed(
-    seedColor: FFColors.green,
-    brightness: brightness,
-  ).copyWith(
+  final scheme = ColorScheme.fromSeed(seedColor: FFColors.green, brightness: brightness).copyWith(
     primary: isDark ? FFColors.greenLight : FFColors.green,
     secondary: isDark ? FFColors.blueLight : FFColors.blue,
     tertiary: FFColors.teal,

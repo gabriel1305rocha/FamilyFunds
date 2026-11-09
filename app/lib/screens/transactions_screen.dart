@@ -32,10 +32,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                for (final (value, label) in [(null, 'Todos'), ('expense', 'Gastos'), ('income', 'Ganhos'), ('transfer', 'Transferências')])
+                for (final (value, label) in [
+                  (null, 'Todos'),
+                  ('expense', 'Gastos'),
+                  ('income', 'Ganhos'),
+                  ('transfer', 'Transferências'),
+                ])
                   Padding(
                     padding: const EdgeInsets.only(right: 8),
-                    child: ChoiceChip(label: Text(label), selected: _type == value, onSelected: (_) => setState(() => _type = value)),
+                    child: ChoiceChip(
+                      label: Text(label),
+                      selected: _type == value,
+                      onSelected: (_) => setState(() => _type = value),
+                    ),
                   ),
                 const SizedBox(width: 8),
                 for (final m in state.members)
@@ -56,7 +65,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             child: AsyncView<List<Txn>>(
               key: ValueKey('$_type|$_memberId'),
               load: (s) async {
-                final rows = await s.api.get('/transactions', {'month': s.month, 'type': _type, 'member_id': _memberId, 'limit': 500}) as List;
+                final rows = await s.api.get('/transactions', {
+                  'month': s.month,
+                  'type': _type,
+                  'member_id': _memberId,
+                  'limit': 500,
+                }) as List;
                 return rows.map((j) => Txn.fromJson(j)).toList();
               },
               builder: (context, txns, _) => _TxnList(txns: txns),
@@ -76,7 +90,14 @@ class _TxnList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (txns.isEmpty) {
-      return ListView(children: const [EmptyState(icon: Icons.receipt_long_outlined, message: 'Nenhum lançamento neste mês.\nToque em "Lançamento" para adicionar.')]);
+      return ListView(
+        children: const [
+          EmptyState(
+            icon: Icons.receipt_long_outlined,
+            message: 'Nenhum lançamento neste mês.\nToque em "Lançamento" para adicionar.',
+          ),
+        ],
+      );
     }
     final groups = <String, List<Txn>>{};
     for (final t in txns) {
@@ -88,9 +109,14 @@ class _TxnList extends StatelessWidget {
         for (final entry in groups.entries) ...[
           Padding(
             padding: const EdgeInsets.fromLTRB(4, 16, 4, 8),
-            child: Text(dayLabel(entry.key), style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).hintColor)),
+            child: Text(
+              dayLabel(entry.key),
+              style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).hintColor),
+            ),
           ),
-          Card(child: Column(children: [for (final t in entry.value) TxnTile(txn: t)])),
+          Card(
+            child: Column(children: [for (final t in entry.value) TxnTile(txn: t)]),
+          ),
         ],
       ],
     );
@@ -111,8 +137,14 @@ class TxnTile extends StatelessWidget {
         builder: (ctx) => SimpleDialog(
           title: const Text('Compra parcelada'),
           children: [
-            SimpleDialogOption(onPressed: () => Navigator.pop(ctx, 'one'), child: const Text('Excluir só esta parcela')),
-            SimpleDialogOption(onPressed: () => Navigator.pop(ctx, 'all'), child: const Text('Excluir todas as parcelas')),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, 'one'),
+              child: const Text('Excluir só esta parcela'),
+            ),
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, 'all'),
+              child: const Text('Excluir todas as parcelas'),
+            ),
           ],
         ),
       );
@@ -133,8 +165,12 @@ class TxnTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isIncome = txn.type == 'income';
     final isTransfer = txn.type == 'transfer';
-    final color = isTransfer ? FFColors.teal : hexColor(txn.categoryColor, isIncome ? FFColors.income : FFColors.expense);
-    final title = txn.description.isNotEmpty ? txn.description : (txn.categoryName ?? (isTransfer ? 'Transferência' : 'Sem descrição'));
+    final color = isTransfer
+        ? FFColors.teal
+        : hexColor(txn.categoryColor, isIncome ? FFColors.income : FFColors.expense);
+    final title = txn.description.isNotEmpty
+        ? txn.description
+        : (txn.categoryName ?? (isTransfer ? 'Transferência' : 'Sem descrição'));
     final subtitle = [
       if (isTransfer) '${txn.accountName} → ${txn.transferAccountName}' else txn.accountName,
       if (!isTransfer && txn.categoryName != null) txn.categoryName!,
@@ -148,16 +184,36 @@ class TxnTile extends StatelessWidget {
         backgroundColor: color.withValues(alpha: 0.15),
         child: Icon(isTransfer ? Icons.swap_horiz : categoryIcon(txn.categoryIcon), color: color),
       ),
-      title: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+      title: Text(
+        title,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
       subtitle: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            '${isIncome ? '+' : isTransfer ? '' : '-'} ${money(txn.amount)}',
-            style: TextStyle(fontWeight: FontWeight.w700, color: isIncome ? FFColors.income : isTransfer ? FFColors.teal : FFColors.expense),
+            '${isIncome
+                ? '+'
+                : isTransfer
+                ? ''
+                : '-'} ${money(txn.amount)}',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              color: isIncome
+                  ? FFColors.income
+                  : isTransfer
+                  ? FFColors.teal
+                  : FFColors.expense,
+            ),
           ),
-          IconButton(tooltip: 'Excluir', icon: const Icon(Icons.delete_outline, size: 20), onPressed: () => _delete(context)),
+          IconButton(
+            tooltip: 'Excluir',
+            icon: const Icon(Icons.delete_outline, size: 20),
+            onPressed: () => _delete(context),
+          ),
         ],
       ),
     );

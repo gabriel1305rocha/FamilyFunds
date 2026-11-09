@@ -7,7 +7,10 @@ import { cashflow, financialHealth, investmentSummary, monthlySummary } from '..
 const router = Router();
 
 const monthQuery = z.object({
-  month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/).default(() => currentMonth()),
+  month: z
+    .string()
+    .regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+    .default(() => currentMonth()),
 });
 
 router.get('/summary', async (req, res) => {

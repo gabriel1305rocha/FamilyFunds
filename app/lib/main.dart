@@ -83,7 +83,10 @@ class FFLogo extends StatelessWidget {
           child: Icon(Icons.family_restroom, color: Colors.white, size: size * 0.6),
         ),
         SizedBox(height: size * 0.2),
-        Text('Family Funds', style: TextStyle(fontSize: size * 0.4, fontWeight: FontWeight.w800, color: color)),
+        Text(
+          'Family Funds',
+          style: TextStyle(fontSize: size * 0.4, fontWeight: FontWeight.w800, color: color),
+        ),
       ],
     );
   }

@@ -12,7 +12,6 @@ export function notFound(_req, _res, next) {
   next(new HttpError(404, 'Rota não encontrada'));
 }
 
-// eslint-disable-next-line no-unused-vars
 export function errorHandler(err, _req, res, _next) {
   if (err instanceof ZodError) {
     return res.status(400).json({

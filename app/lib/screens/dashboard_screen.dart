@@ -29,7 +29,10 @@ class DashboardScreen extends StatelessWidget {
           children: [
             Text('Olá, ${state.me?.name.split(' ').first ?? ''}'),
             if (state.me?.familyName != null)
-              Text(state.me!.familyName!, style: TextStyle(fontSize: 13, color: Theme.of(context).hintColor, fontWeight: FontWeight.w400)),
+              Text(
+                state.me!.familyName!,
+                style: TextStyle(fontSize: 13, color: Theme.of(context).hintColor, fontWeight: FontWeight.w400),
+              ),
           ],
         ),
         actions: [
@@ -78,13 +81,18 @@ class _DashboardBody extends StatelessWidget {
         const SizedBox(height: 16),
         _HealthTile(health: health),
         const SizedBox(height: 16),
-        SectionCard(title: 'Ganhos x gastos', child: CashflowChart(data: data['cashflow'] as List)),
+        SectionCard(
+          title: 'Ganhos x gastos',
+          child: CashflowChart(data: data['cashflow'] as List),
+        ),
         const SizedBox(height: 16),
         SectionCard(
           title: 'Gastos por pessoa',
           child: byMember.isEmpty
               ? const Text('Nenhum membro')
-              : Column(children: [for (final m in byMember) _MemberRow(member: m, total: toDouble(summary['expense']))]),
+              : Column(
+                  children: [for (final m in byMember) _MemberRow(member: m, total: toDouble(summary['expense']))],
+                ),
         ),
         const SizedBox(height: 16),
         SectionCard(
@@ -100,12 +108,18 @@ class _DashboardBody extends StatelessWidget {
                         hexColor(byCategory[i]['color'], FFColors.chart[i % FFColors.chart.length]),
                       ),
                   ],
-                  center: Text(moneyCompact(toDouble(summary['expense'])), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                  center: Text(
+                    moneyCompact(toDouble(summary['expense'])),
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  ),
                 ),
         ),
         if (byAccountType.isNotEmpty) ...[
           const SizedBox(height: 16),
-          SectionCard(title: 'Como a família pagou', child: _PaymentSplit(items: byAccountType)),
+          SectionCard(
+            title: 'Como a família pagou',
+            child: _PaymentSplit(items: byAccountType),
+          ),
         ],
         if (budgets.isNotEmpty) ...[
           const SizedBox(height: 16),
@@ -142,13 +156,20 @@ class _BalanceCard extends StatelessWidget {
         children: [
           const Text('Sobrou no mês', style: white70),
           const SizedBox(height: 4),
-          Text(money(balance), style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800)),
+          Text(
+            money(balance),
+            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
+          ),
           Text('Taxa de poupança: ${percent(toDouble(summary['savings_rate']))}', style: white70),
           const SizedBox(height: 18),
           Row(
             children: [
-              Expanded(child: _Figure(icon: Icons.arrow_downward, label: 'Ganhos', value: income)),
-              Expanded(child: _Figure(icon: Icons.arrow_upward, label: 'Gastos', value: expense)),
+              Expanded(
+                child: _Figure(icon: Icons.arrow_downward, label: 'Ganhos', value: income),
+              ),
+              Expanded(
+                child: _Figure(icon: Icons.arrow_upward, label: 'Gastos', value: expense),
+              ),
             ],
           ),
           const Divider(color: Colors.white24, height: 28),
@@ -156,13 +177,13 @@ class _BalanceCard extends StatelessWidget {
             children: [
               const Icon(Icons.account_balance, color: Colors.white70, size: 18),
               const SizedBox(width: 8),
-              Text('Patrimônio: ${money(netWorth)}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+              Text(
+                'Patrimônio: ${money(netWorth)}',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              ),
               const Spacer(),
               if (expenseDelta != null)
-                Text(
-                  '${expenseDelta > 0 ? '▲' : '▼'} ${percent(expenseDelta.abs())} gastos',
-                  style: white70,
-                ),
+                Text('${expenseDelta > 0 ? '▲' : '▼'} ${percent(expenseDelta.abs())} gastos', style: white70),
             ],
           ),
         ],
@@ -182,14 +203,23 @@ class _Figure extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        CircleAvatar(radius: 16, backgroundColor: Colors.white24, child: Icon(icon, color: Colors.white, size: 18)),
+        CircleAvatar(
+          radius: 16,
+          backgroundColor: Colors.white24,
+          child: Icon(icon, color: Colors.white, size: 18),
+        ),
         const SizedBox(width: 8),
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
-              FittedBox(child: Text(money(value), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
+              FittedBox(
+                child: Text(
+                  money(value),
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                ),
+              ),
             ],
           ),
         ),
@@ -216,12 +246,19 @@ class _HealthTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Saúde financeira: ${healthLevels[health['level']] ?? ''}',
-                    style: TextStyle(fontWeight: FontWeight.w700, color: ScoreGauge.colorFor(score))),
+                Text(
+                  'Saúde financeira: ${healthLevels[health['level']] ?? ''}',
+                  style: TextStyle(fontWeight: FontWeight.w700, color: ScoreGauge.colorFor(score)),
+                ),
                 const SizedBox(height: 4),
                 if (recs.isNotEmpty) Text(recs.first['title'], style: const TextStyle(fontWeight: FontWeight.w600)),
                 if (recs.isNotEmpty)
-                  Text(recs.first['message'], maxLines: 2, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor)),
+                  Text(
+                    recs.first['message'],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+                  ),
               ],
             ),
           ),
@@ -253,8 +290,13 @@ class _MemberRow extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text(member['name'], style: const TextStyle(fontWeight: FontWeight.w600))),
-                    Text(money(expense), style: const TextStyle(fontWeight: FontWeight.w700, color: FFColors.expense)),
+                    Expanded(
+                      child: Text(member['name'], style: const TextStyle(fontWeight: FontWeight.w600)),
+                    ),
+                    Text(
+                      money(expense),
+                      style: const TextStyle(fontWeight: FontWeight.w700, color: FFColors.expense),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -298,14 +340,21 @@ class _PaymentSplit extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(i['account_type'] == 'credit_card' ? Icons.credit_card : Icons.account_balance, size: 18, color: i['account_type'] == 'credit_card' ? FFColors.blue : FFColors.green),
+                    Icon(
+                      i['account_type'] == 'credit_card' ? Icons.credit_card : Icons.account_balance,
+                      size: 18,
+                      color: i['account_type'] == 'credit_card' ? FFColors.blue : FFColors.green,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(child: Text(labels[i['account_type']] ?? i['account_type'])),
                     Text(money(toDouble(i['expense'])), style: const TextStyle(fontWeight: FontWeight.w600)),
                   ],
                 ),
                 const SizedBox(height: 6),
-                ProgressBar(value: toDouble(i['share']), color: i['account_type'] == 'credit_card' ? FFColors.blue : FFColors.green),
+                ProgressBar(
+                  value: toDouble(i['share']),
+                  color: i['account_type'] == 'credit_card' ? FFColors.blue : FFColors.green,
+                ),
               ],
             ),
           ),
@@ -333,7 +382,10 @@ class _BudgetRow extends StatelessWidget {
               Icon(categoryIcon(budget['icon']), size: 18, color: hexColor(budget['color'])),
               const SizedBox(width: 8),
               Expanded(child: Text(budget['category_name'])),
-              Text('${money(toDouble(budget['spent']))} / ${money(toDouble(budget['budget']))}', style: const TextStyle(fontSize: 12)),
+              Text(
+                '${money(toDouble(budget['spent']))} / ${money(toDouble(budget['budget']))}',
+                style: const TextStyle(fontSize: 12),
+              ),
             ],
           ),
           const SizedBox(height: 6),

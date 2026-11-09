@@ -1,16 +1,37 @@
-# Banco de dados local para desenvolvimento: docker compose up -d
+# Desenvolvimento: `docker compose up -d postgres` (só o banco) e rode a API com `npm run dev`.
+# Uso em casa (API + banco): crie um arquivo .env na raiz com JWT_SECRET e rode `docker compose up -d`.
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: familyfunds
-      POSTGRES_PASSWORD: familyfunds
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-familyfunds}
       POSTGRES_DB: familyfunds
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U familyfunds"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://familyfunds:${POSTGRES_PASSWORD:-familyfunds}@postgres:5432/familyfunds
+      JWT_SECRET: ${JWT_SECRET:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-}
+    ports:
+      - "3000:3000"
+    profiles: ["full"]
 
 volumes:
   pgdata:

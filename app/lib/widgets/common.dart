@@ -35,12 +35,32 @@ IconData categoryIcon(String? name) => _icons[name] ?? Icons.category_outlined;
 
 const categoryIconNames = ['category', ..._iconKeys];
 const _iconKeys = [
-  'work', 'savings', 'trending_up', 'home', 'shopping_cart', 'directions_car', 'favorite', 'school',
-  'receipt', 'restaurant', 'celebration', 'shopping_bag', 'subscriptions', 'pets', 'flight', 'child_care',
+  'work',
+  'savings',
+  'trending_up',
+  'home',
+  'shopping_cart',
+  'directions_car',
+  'favorite',
+  'school',
+  'receipt',
+  'restaurant',
+  'celebration',
+  'shopping_bag',
+  'subscriptions',
+  'pets',
+  'flight',
+  'child_care',
 ];
 
 class SectionCard extends StatelessWidget {
-  const SectionCard({super.key, this.title, this.trailing, required this.child, this.padding = const EdgeInsets.all(16)});
+  const SectionCard({
+    super.key,
+    this.title,
+    this.trailing,
+    required this.child,
+    this.padding = const EdgeInsets.all(16),
+  });
 
   final String? title;
   final Widget? trailing;
@@ -60,7 +80,12 @@ class SectionCard extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   children: [
-                    Expanded(child: Text(title!, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700))),
+                    Expanded(
+                      child: Text(
+                        title!,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
                     ?trailing,
                   ],
                 ),
@@ -82,7 +107,11 @@ class MonthSelector extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(icon: const Icon(Icons.chevron_left), onPressed: () => state.shiftMonth(-1), tooltip: 'Mês anterior'),
+        IconButton(
+          icon: const Icon(Icons.chevron_left),
+          onPressed: () => state.shiftMonth(-1),
+          tooltip: 'Mês anterior',
+        ),
         Text(monthLabel(state.month), style: const TextStyle(fontWeight: FontWeight.w600)),
         IconButton(icon: const Icon(Icons.chevron_right), onPressed: () => state.shiftMonth(1), tooltip: 'Próximo mês'),
       ],
@@ -123,7 +152,13 @@ class ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = color ?? (value > 1 ? FFColors.danger : value > 0.85 ? FFColors.warning : FFColors.green);
+    final c =
+        color ??
+        (value > 1
+            ? FFColors.danger
+            : value > 0.85
+            ? FFColors.warning
+            : FFColors.green);
     return ClipRRect(
       borderRadius: BorderRadius.circular(height),
       child: LinearProgressIndicator(

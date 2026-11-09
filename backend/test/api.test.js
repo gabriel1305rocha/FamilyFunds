@@ -33,7 +33,10 @@ describe('auth', () => {
   });
 
   test('valida dados de cadastro', async () => {
-    const res = await request(app).post('/api/auth/register').send({ familyName: 'x', name: 'y', email: 'nope', password: '1' }).expect(400);
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ familyName: 'x', name: 'y', email: 'nope', password: '1' })
+      .expect(400);
     assert.ok(res.body.details.length >= 2);
   });
 });
@@ -41,15 +44,45 @@ describe('auth', () => {
 describe('contas e lançamentos', () => {
   test('saldo da conta corrente e do cartão de crédito com pagamento de fatura', async () => {
     const { api, member } = await registerFamily();
-    const checking = (await api.post('/api/accounts', { name: 'Corrente', type: 'checking', initial_balance: 1000 }).expect(201)).body;
-    const card = (await api.post('/api/accounts', { name: 'Cartão', type: 'credit_card', credit_limit: 5000, closing_day: 5, due_day: 12 }).expect(201)).body;
+    const checking = (
+      await api.post('/api/accounts', { name: 'Corrente', type: 'checking', initial_balance: 1000 }).expect(201)
+    ).body;
+    const card = (
+      await api
+        .post('/api/accounts', { name: 'Cartão', type: 'credit_card', credit_limit: 5000, closing_day: 5, due_day: 12 })
+        .expect(201)
+    ).body;
     const cats = (await api.get('/api/categories')).body;
     const salary = cats.find((c) => c.name === 'Salário');
     const market = cats.find((c) => c.name === 'Mercado');
 
-    await api.post('/api/transactions', { type: 'income', account_id: checking.id, category_id: salary.id, amount: 5000, date: `${month}-01` }).expect(201);
-    await api.post('/api/transactions', { type: 'expense', account_id: card.id, category_id: market.id, amount: 800, date: `${month}-01` }).expect(201);
-    await api.post('/api/transactions', { type: 'transfer', account_id: checking.id, transfer_account_id: card.id, amount: 500, date: `${month}-01` }).expect(201);
+    await api
+      .post('/api/transactions', {
+        type: 'income',
+        account_id: checking.id,
+        category_id: salary.id,
+        amount: 5000,
+        date: `${month}-01`,
+      })
+      .expect(201);
+    await api
+      .post('/api/transactions', {
+        type: 'expense',
+        account_id: card.id,
+        category_id: market.id,
+        amount: 800,
+        date: `${month}-01`,
+      })
+      .expect(201);
+    await api
+      .post('/api/transactions', {
+        type: 'transfer',
+        account_id: checking.id,
+        transfer_account_id: card.id,
+        amount: 500,
+        date: `${month}-01`,
+      })
+      .expect(201);
 
     const accounts = (await api.get('/api/accounts').expect(200)).body;
     const c = accounts.find((a) => a.id === checking.id);
@@ -66,13 +99,28 @@ describe('contas e lançamentos', () => {
 
   test('compra parcelada gera parcelas mensais somando o total', async () => {
     const { api } = await registerFamily();
-    const card = (await api.post('/api/accounts', { name: 'Cartão', type: 'credit_card', credit_limit: 3000 }).expect(201)).body;
+    const card = (
+      await api.post('/api/accounts', { name: 'Cartão', type: 'credit_card', credit_limit: 3000 }).expect(201)
+    ).body;
     const res = await api
-      .post('/api/transactions', { type: 'expense', account_id: card.id, amount: 1000, installments: 3, description: 'TV', date: '2026-01-31' })
+      .post('/api/transactions', {
+        type: 'expense',
+        account_id: card.id,
+        amount: 1000,
+        installments: 3,
+        description: 'TV',
+        date: '2026-01-31',
+      })
       .expect(201);
     assert.equal(res.body.length, 3);
-    assert.deepEqual(res.body.map((t) => t.date), ['2026-01-31', '2026-02-28', '2026-03-31']);
-    assert.equal(res.body.reduce((s, t) => s + t.amount, 0), 1000);
+    assert.deepEqual(
+      res.body.map((t) => t.date),
+      ['2026-01-31', '2026-02-28', '2026-03-31'],
+    );
+    assert.equal(
+      res.body.reduce((s, t) => s + t.amount, 0),
+      1000,
+    );
     assert.equal(res.body[2].description, 'TV (3/3)');
 
     await api.delete(`/api/transactions/${res.body[0].id}?scope=all`).expect(204);
@@ -84,10 +132,30 @@ describe('contas e lançamentos', () => {
     const acc = (await api.post('/api/accounts', { name: 'C', type: 'checking' }).expect(201)).body;
     const cats = (await api.get('/api/categories')).body;
     const salary = cats.find((c) => c.name === 'Salário');
-    await api.post('/api/transactions', { type: 'transfer', account_id: acc.id, amount: 10, date: '2026-01-01' }).expect(400);
-    await api.post('/api/transactions', { type: 'expense', account_id: acc.id, category_id: salary.id, amount: 10, date: '2026-01-01' }).expect(400);
-    await api.post('/api/transactions', { type: 'expense', account_id: acc.id, amount: -5, date: '2026-01-01' }).expect(400);
-    await api.post('/api/transactions', { type: 'income', account_id: acc.id, amount: 10, installments: 2, date: '2026-01-01' }).expect(400);
+    await api
+      .post('/api/transactions', { type: 'transfer', account_id: acc.id, amount: 10, date: '2026-01-01' })
+      .expect(400);
+    await api
+      .post('/api/transactions', {
+        type: 'expense',
+        account_id: acc.id,
+        category_id: salary.id,
+        amount: 10,
+        date: '2026-01-01',
+      })
+      .expect(400);
+    await api
+      .post('/api/transactions', { type: 'expense', account_id: acc.id, amount: -5, date: '2026-01-01' })
+      .expect(400);
+    await api
+      .post('/api/transactions', {
+        type: 'income',
+        account_id: acc.id,
+        amount: 10,
+        installments: 2,
+        date: '2026-01-01',
+      })
+      .expect(400);
   });
 
   test('uma família não acessa dados de outra', async () => {
@@ -96,7 +164,9 @@ describe('contas e lançamentos', () => {
     const accA = (await a.api.post('/api/accounts', { name: 'A', type: 'checking' }).expect(201)).body;
     await b.api.get(`/api/accounts/${accA.id}`).expect(404);
     await b.api.patch(`/api/accounts/${accA.id}`, { name: 'hack' }).expect(404);
-    await b.api.post('/api/transactions', { type: 'income', account_id: accA.id, amount: 10, date: '2026-01-01' }).expect(400);
+    await b.api
+      .post('/api/transactions', { type: 'income', account_id: accA.id, amount: 10, date: '2026-01-01' })
+      .expect(400);
     assert.equal((await b.api.get('/api/accounts')).body.length, 0);
   });
 });
@@ -107,9 +177,21 @@ describe('membros', () => {
     const wife = (await api.post('/api/members', { name: 'Esposa', color: '#1E88E5' }).expect(201)).body;
     assert.equal(wife.has_login, false);
     const acc = (await api.post('/api/accounts', { name: 'C', type: 'checking' }).expect(201)).body;
-    await api.post('/api/transactions', { type: 'income', account_id: acc.id, amount: 4000, date: `${month}-02` }).expect(201);
-    await api.post('/api/transactions', { type: 'expense', account_id: acc.id, member_id: wife.id, amount: 300, date: `${month}-02` }).expect(201);
-    await api.post('/api/transactions', { type: 'expense', account_id: acc.id, amount: 100, date: `${month}-02` }).expect(201);
+    await api
+      .post('/api/transactions', { type: 'income', account_id: acc.id, amount: 4000, date: `${month}-02` })
+      .expect(201);
+    await api
+      .post('/api/transactions', {
+        type: 'expense',
+        account_id: acc.id,
+        member_id: wife.id,
+        amount: 300,
+        date: `${month}-02`,
+      })
+      .expect(201);
+    await api
+      .post('/api/transactions', { type: 'expense', account_id: acc.id, amount: 100, date: `${month}-02` })
+      .expect(201);
 
     const summary = (await api.get(`/api/reports/summary?month=${month}`).expect(200)).body;
     assert.equal(summary.income, 4000);
@@ -128,14 +210,27 @@ describe('relatórios', () => {
   test('saúde financeira, orçamento e investimentos', async () => {
     const { api } = await registerFamily();
     const acc = (await api.post('/api/accounts', { name: 'C', type: 'checking' }).expect(201)).body;
-    const card = (await api.post('/api/accounts', { name: 'K', type: 'credit_card', credit_limit: 1000 }).expect(201)).body;
+    const card = (await api.post('/api/accounts', { name: 'K', type: 'credit_card', credit_limit: 1000 }).expect(201))
+      .body;
     const cats = (await api.get('/api/categories')).body;
     const lazer = cats.find((c) => c.name === 'Lazer');
 
-    await api.post('/api/transactions', { type: 'income', account_id: acc.id, amount: 10000, date: `${month}-01` }).expect(201);
-    await api.post('/api/transactions', { type: 'expense', account_id: card.id, category_id: lazer.id, amount: 900, date: `${month}-01` }).expect(201);
+    await api
+      .post('/api/transactions', { type: 'income', account_id: acc.id, amount: 10000, date: `${month}-01` })
+      .expect(201);
+    await api
+      .post('/api/transactions', {
+        type: 'expense',
+        account_id: card.id,
+        category_id: lazer.id,
+        amount: 900,
+        date: `${month}-01`,
+      })
+      .expect(201);
     await api.post('/api/budgets', { category_id: lazer.id, month, amount: 500 }).expect(201);
-    await api.post('/api/investments', { name: 'BTC', type: 'crypto', invested_amount: 1000, current_value: 3000 }).expect(201);
+    await api
+      .post('/api/investments', { name: 'BTC', type: 'crypto', invested_amount: 1000, current_value: 3000 })
+      .expect(201);
 
     const health = (await api.get(`/api/reports/health?month=${month}`).expect(200)).body;
     assert.ok(health.score >= 0 && health.score <= 100);
@@ -160,5 +255,12 @@ describe('relatórios', () => {
     const health = (await api.get('/api/reports/health').expect(200)).body;
     assert.equal(health.score, null);
     assert.equal(health.level, 'sem_dados');
+  });
+});
+
+describe('infra', () => {
+  test('healthcheck confirma conexão com o banco', async () => {
+    const res = await request(app).get('/health').expect(200);
+    assert.deepEqual(res.body, { status: 'ok', database: 'ok' });
   });
 });

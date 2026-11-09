@@ -21,7 +21,13 @@ class AccountsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Contas e cartões'),
-        actions: [IconButton(tooltip: 'Nova conta', icon: const Icon(Icons.add_card), onPressed: () => showAccountForm(context))],
+        actions: [
+          IconButton(
+            tooltip: 'Nova conta',
+            icon: const Icon(Icons.add_card),
+            onPressed: () => showAccountForm(context),
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: state.refreshReference,
@@ -30,23 +36,49 @@ class AccountsScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(child: _TotalTile(label: 'Em conta', value: totalBanks, color: FFColors.green, icon: Icons.account_balance)),
+                Expanded(
+                  child: _TotalTile(
+                    label: 'Em conta',
+                    value: totalBanks,
+                    color: FFColors.green,
+                    icon: Icons.account_balance,
+                  ),
+                ),
                 const SizedBox(width: 12),
-                Expanded(child: _TotalTile(label: 'Faturas em aberto', value: totalCardDebt, color: FFColors.blue, icon: Icons.credit_card)),
+                Expanded(
+                  child: _TotalTile(
+                    label: 'Faturas em aberto',
+                    value: totalCardDebt,
+                    color: FFColors.blue,
+                    icon: Icons.credit_card,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 20),
             _Header('Contas correntes e poupança'),
             if (banks.isEmpty)
-              _AddTile(label: 'Adicionar conta corrente', onTap: () => showAccountForm(context, type: AccountType.checking))
+              _AddTile(
+                label: 'Adicionar conta corrente',
+                onTap: () => showAccountForm(context, type: AccountType.checking),
+              )
             else
-              Card(child: Column(children: [for (final a in banks) _BankTile(account: a)])),
+              Card(
+                child: Column(children: [for (final a in banks) _BankTile(account: a)]),
+              ),
             const SizedBox(height: 20),
             _Header('Cartões de crédito'),
             if (cards.isEmpty)
-              _AddTile(label: 'Adicionar cartão de crédito', onTap: () => showAccountForm(context, type: AccountType.creditCard))
+              _AddTile(
+                label: 'Adicionar cartão de crédito',
+                onTap: () => showAccountForm(context, type: AccountType.creditCard),
+              )
             else
-              for (final c in cards) Padding(padding: const EdgeInsets.only(bottom: 12), child: _CardTile(card: c)),
+              for (final c in cards)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _CardTile(card: c),
+                ),
           ],
         ),
       ),
@@ -60,9 +92,9 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(left: 4, bottom: 8),
-        child: Text(text, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-      );
+    padding: const EdgeInsets.only(left: 4, bottom: 8),
+    child: Text(text, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+  );
 }
 
 class _TotalTile extends StatelessWidget {
@@ -84,7 +116,12 @@ class _TotalTile extends StatelessWidget {
           Icon(icon, color: color),
           const SizedBox(height: 8),
           Text(label, style: TextStyle(color: color, fontSize: 13)),
-          FittedBox(child: Text(money(value), style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.w800))),
+          FittedBox(
+            child: Text(
+              money(value),
+              style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.w800),
+            ),
+          ),
         ],
       ),
     );
@@ -97,7 +134,13 @@ class _AddTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Card(child: ListTile(leading: const Icon(Icons.add_circle_outline, color: FFColors.green), title: Text(label), onTap: onTap));
+  Widget build(BuildContext context) => Card(
+    child: ListTile(
+      leading: const Icon(Icons.add_circle_outline, color: FFColors.green),
+      title: Text(label),
+      onTap: onTap,
+    ),
+  );
 }
 
 class _BankTile extends StatelessWidget {
@@ -111,10 +154,15 @@ class _BankTile extends StatelessWidget {
       onTap: () => showAccountForm(context, account: account),
       leading: CircleAvatar(
         backgroundColor: hexColor(account.color).withValues(alpha: 0.15),
-        child: Icon(account.type == AccountType.savings ? Icons.savings_outlined : Icons.account_balance, color: hexColor(account.color)),
+        child: Icon(
+          account.type == AccountType.savings ? Icons.savings_outlined : Icons.account_balance,
+          color: hexColor(account.color),
+        ),
       ),
       title: Text(account.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text([account.type.label, account.institution, owner?.name ?? 'Conjunta'].whereType<String>().join(' · ')),
+      subtitle: Text(
+        [account.type.label, account.institution, owner?.name ?? 'Conjunta'].whereType<String>().join(' · '),
+      ),
       trailing: Text(
         money(account.balance),
         style: TextStyle(fontWeight: FontWeight.w700, color: account.balance < 0 ? FFColors.danger : FFColors.green),
@@ -138,7 +186,11 @@ class _CardTile extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(colors: [base, Color.lerp(base, FFColors.navy, 0.45)!], begin: Alignment.topLeft, end: Alignment.bottomRight),
+          gradient: LinearGradient(
+            colors: [base, Color.lerp(base, FFColors.navy, 0.45)!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,16 +199,26 @@ class _CardTile extends StatelessWidget {
               children: [
                 const Icon(Icons.credit_card, color: Colors.white),
                 const SizedBox(width: 8),
-                Expanded(child: Text(card.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16))),
+                Expanded(
+                  child: Text(
+                    card.name,
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                ),
                 Text(owner?.name ?? 'Conjunto', style: const TextStyle(color: Colors.white70)),
               ],
             ),
             const SizedBox(height: 14),
             const Text('Fatura atual', style: TextStyle(color: Colors.white70, fontSize: 12)),
-            Text(money(card.currentBill ?? (card.balance < 0 ? -card.balance : 0)),
-                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+            Text(
+              money(card.currentBill ?? (card.balance < 0 ? -card.balance : 0)),
+              style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
+            ),
             if (card.closingDay != null)
-              Text('Fecha dia ${card.closingDay} · vence dia ${card.dueDay ?? '-'}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+              Text(
+                'Fecha dia ${card.closingDay} · vence dia ${card.dueDay ?? '-'}',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
             if (card.creditLimit != null) ...[
               const SizedBox(height: 12),
               ProgressBar(value: card.utilization ?? 0, color: Colors.white),
@@ -272,10 +334,17 @@ class _AccountFormState extends State<_AccountForm> {
               Row(
                 children: [
                   Expanded(
-                    child: Text(a == null ? 'Nova conta' : 'Editar conta',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+                    child: Text(
+                      a == null ? 'Nova conta' : 'Editar conta',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                    ),
                   ),
-                  if (a != null) IconButton(tooltip: 'Excluir', onPressed: _delete, icon: const Icon(Icons.delete_outline, color: FFColors.danger)),
+                  if (a != null)
+                    IconButton(
+                      tooltip: 'Excluir',
+                      onPressed: _delete,
+                      icon: const Icon(Icons.delete_outline, color: FFColors.danger),
+                    ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -288,11 +357,17 @@ class _AccountFormState extends State<_AccountForm> {
               const SizedBox(height: 12),
               TextFormField(
                 controller: _name,
-                decoration: InputDecoration(labelText: 'Nome', hintText: isCard ? 'Ex.: Nubank da Ana' : 'Ex.: Conta conjunta'),
+                decoration: InputDecoration(
+                  labelText: 'Nome',
+                  hintText: isCard ? 'Ex.: Nubank da Ana' : 'Ex.: Conta conjunta',
+                ),
                 validator: (v) => (v ?? '').trim().isEmpty ? 'Informe um nome' : null,
               ),
               const SizedBox(height: 12),
-              TextFormField(controller: _institution, decoration: const InputDecoration(labelText: 'Banco / instituição')),
+              TextFormField(
+                controller: _institution,
+                decoration: const InputDecoration(labelText: 'Banco / instituição'),
+              ),
               const SizedBox(height: 12),
               DropdownButtonFormField<int?>(
                 initialValue: _ownerId,
@@ -322,11 +397,21 @@ class _AccountFormState extends State<_AccountForm> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextFormField(controller: _closing, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Dia do fechamento'), validator: _dayValidator),
+                      child: TextFormField(
+                        controller: _closing,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'Dia do fechamento'),
+                        validator: _dayValidator,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: TextFormField(controller: _due, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Dia do vencimento'), validator: _dayValidator),
+                      child: TextFormField(
+                        controller: _due,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'Dia do vencimento'),
+                        validator: _dayValidator,
+                      ),
                     ),
                   ],
                 ),
@@ -341,13 +426,18 @@ class _AccountFormState extends State<_AccountForm> {
                       child: CircleAvatar(
                         radius: 16,
                         backgroundColor: c,
-                        child: _color.toARGB32() == c.toARGB32() ? const Icon(Icons.check, color: Colors.white, size: 18) : null,
+                        child: _color.toARGB32() == c.toARGB32()
+                            ? const Icon(Icons.check, color: Colors.white, size: 18)
+                            : null,
                       ),
                     ),
                 ],
               ),
               const SizedBox(height: 20),
-              FilledButton(onPressed: _saving ? null : _save, child: _saving ? const CircularProgressIndicator(strokeWidth: 2) : const Text('Salvar')),
+              FilledButton(
+                onPressed: _saving ? null : _save,
+                child: _saving ? const CircularProgressIndicator(strokeWidth: 2) : const Text('Salvar'),
+              ),
             ],
           ),
         ),

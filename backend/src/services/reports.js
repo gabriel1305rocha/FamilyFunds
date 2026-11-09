@@ -67,7 +67,11 @@ export async function monthlySummary(familyId, month = currentMonth()) {
     income_by_category: byCategory.rows
       .filter((r) => r.type === 'income')
       .map((r) => ({ ...r, share: pct(r.total, income) })),
-    by_member: byMember.rows.map((r) => ({ ...r, balance: round(r.income - r.expense), expense_share: pct(r.expense, expense) })),
+    by_member: byMember.rows.map((r) => ({
+      ...r,
+      balance: round(r.income - r.expense),
+      expense_share: pct(r.expense, expense),
+    })),
     expense_by_account_type: byAccountType.rows.map((r) => ({ ...r, share: pct(r.expense, expense) })),
     budgets,
   };
@@ -249,29 +253,68 @@ export async function financialHealth(familyId, month = currentMonth()) {
       invested: investments.current,
       net_worth: netWorth,
     },
-    recommendations: recommendations({ savingsRate, emergencyMonths, utilization, billToIncome, budgets, avgExpense, liquidAssets, investments, hasData: months.length > 0 }),
+    recommendations: recommendations({
+      savingsRate,
+      emergencyMonths,
+      utilization,
+      billToIncome,
+      budgets,
+      avgExpense,
+      liquidAssets,
+      investments,
+      hasData: months.length > 0,
+    }),
   };
 }
 
 function recommendations(ctx) {
   const out = [];
   if (!ctx.hasData) {
-    return [{ priority: 'info', title: 'Comece registrando seus lançamentos', message: 'Cadastre suas receitas e despesas para calcularmos a saúde financeira da família.' }];
+    return [
+      {
+        priority: 'info',
+        title: 'Comece registrando seus lançamentos',
+        message: 'Cadastre suas receitas e despesas para calcularmos a saúde financeira da família.',
+      },
+    ];
   }
   if (ctx.savingsRate < 0) {
-    out.push({ priority: 'high', title: 'Gastos acima da renda', message: 'Nos últimos meses a família gastou mais do que ganhou. Revise as despesas não essenciais e evite novas parcelas.' });
+    out.push({
+      priority: 'high',
+      title: 'Gastos acima da renda',
+      message:
+        'Nos últimos meses a família gastou mais do que ganhou. Revise as despesas não essenciais e evite novas parcelas.',
+    });
   } else if (ctx.savingsRate < 0.1) {
-    out.push({ priority: 'medium', title: 'Aumente a taxa de poupança', message: 'Tente guardar ao menos 10% a 20% da renda logo que o salário cair ("pague-se primeiro").' });
+    out.push({
+      priority: 'medium',
+      title: 'Aumente a taxa de poupança',
+      message: 'Tente guardar ao menos 10% a 20% da renda logo que o salário cair ("pague-se primeiro").',
+    });
   }
   if (ctx.billToIncome > 0.5) {
-    out.push({ priority: 'high', title: 'Fatura do cartão pesada', message: 'A fatura em aberto passa de 50% da renda mensal. Evite o rotativo: os juros do cartão estão entre os mais altos do mercado.' });
+    out.push({
+      priority: 'high',
+      title: 'Fatura do cartão pesada',
+      message:
+        'A fatura em aberto passa de 50% da renda mensal. Evite o rotativo: os juros do cartão estão entre os mais altos do mercado.',
+    });
   }
   if (ctx.utilization > 0.7) {
-    out.push({ priority: 'medium', title: 'Limite do cartão quase no fim', message: 'Usar mais de 70% do limite reduz sua margem para imprevistos. Concentre as compras na conta corrente por um tempo.' });
+    out.push({
+      priority: 'medium',
+      title: 'Limite do cartão quase no fim',
+      message:
+        'Usar mais de 70% do limite reduz sua margem para imprevistos. Concentre as compras na conta corrente por um tempo.',
+    });
   }
   const over = ctx.budgets.filter((b) => b.spent > b.budget);
   if (over.length) {
-    out.push({ priority: 'medium', title: 'Orçamento estourado', message: `Categorias acima do limite: ${over.map((b) => b.category_name).join(', ')}.` });
+    out.push({
+      priority: 'medium',
+      title: 'Orçamento estourado',
+      message: `Categorias acima do limite: ${over.map((b) => b.category_name).join(', ')}.`,
+    });
   }
   if (ctx.emergencyMonths < 6) {
     const missing = round(Math.max(0, ctx.avgExpense * 6 - ctx.liquidAssets));
@@ -283,7 +326,11 @@ function recommendations(ctx) {
   }
   out.push(...investmentInsights(ctx));
   if (!out.length) {
-    out.push({ priority: 'info', title: 'Finanças em dia!', message: 'A família está poupando, com reserva formada e crédito sob controle. Continue assim.' });
+    out.push({
+      priority: 'info',
+      title: 'Finanças em dia!',
+      message: 'A família está poupando, com reserva formada e crédito sob controle. Continue assim.',
+    });
   }
   return out;
 }
@@ -291,19 +338,37 @@ function recommendations(ctx) {
 function investmentInsights({ emergencyMonths, savingsRate, investments }) {
   const out = [];
   if (emergencyMonths >= 6 && savingsRate > 0 && investments.current === 0) {
-    out.push({ priority: 'info', title: 'Hora de investir', message: 'A reserva de emergência está completa. Considere direcionar a sobra mensal para objetivos de médio e longo prazo (Tesouro IPCA+, CDBs, fundos imobiliários, ações).' });
+    out.push({
+      priority: 'info',
+      title: 'Hora de investir',
+      message:
+        'A reserva de emergência está completa. Considere direcionar a sobra mensal para objetivos de médio e longo prazo (Tesouro IPCA+, CDBs, fundos imobiliários, ações).',
+    });
   }
   if (investments.current > 0) {
     if (emergencyMonths < 3 && investments.variable_income_share > 0.3) {
-      out.push({ priority: 'medium', title: 'Prioridade: liquidez', message: 'Boa parte dos investimentos está em renda variável enquanto a reserva de emergência ainda é pequena. Priorize completar a reserva em renda fixa de liquidez diária.' });
+      out.push({
+        priority: 'medium',
+        title: 'Prioridade: liquidez',
+        message:
+          'Boa parte dos investimentos está em renda variável enquanto a reserva de emergência ainda é pequena. Priorize completar a reserva em renda fixa de liquidez diária.',
+      });
     }
     const top = investments.allocation[0];
     if (investments.allocation.length && top.share > 0.8 && investments.current > 10000) {
-      out.push({ priority: 'info', title: 'Diversifique a carteira', message: `${Math.round(top.share * 100)}% do patrimônio investido está em ${top.label}. Diversificar reduz o risco.` });
+      out.push({
+        priority: 'info',
+        title: 'Diversifique a carteira',
+        message: `${Math.round(top.share * 100)}% do patrimônio investido está em ${top.label}. Diversificar reduz o risco.`,
+      });
     }
     const crypto = investments.allocation.find((a) => a.type === 'crypto');
     if (crypto && crypto.share > 0.1) {
-      out.push({ priority: 'medium', title: 'Exposição alta a cripto', message: `Criptoativos representam ${Math.round(crypto.share * 100)}% da carteira. É comum limitar ativos muito voláteis a até 5–10%.` });
+      out.push({
+        priority: 'medium',
+        title: 'Exposição alta a cripto',
+        message: `Criptoativos representam ${Math.round(crypto.share * 100)}% da carteira. É comum limitar ativos muito voláteis a até 5–10%.`,
+      });
     }
   }
   return out;

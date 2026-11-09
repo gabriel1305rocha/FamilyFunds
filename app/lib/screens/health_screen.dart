@@ -54,11 +54,23 @@ class _HealthBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(healthLevels[health['level']] ?? '', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800)),
+                    Text(
+                      healthLevels[health['level']] ?? '',
+                      style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w800),
+                    ),
                     const SizedBox(height: 6),
-                    Text('Renda média: ${money(toDouble(figures['avg_income']))}', style: const TextStyle(color: Colors.white)),
-                    Text('Gasto médio: ${money(toDouble(figures['avg_expense']))}', style: const TextStyle(color: Colors.white)),
-                    Text('Patrimônio: ${money(toDouble(figures['net_worth']))}', style: const TextStyle(color: Colors.white)),
+                    Text(
+                      'Renda média: ${money(toDouble(figures['avg_income']))}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Gasto médio: ${money(toDouble(figures['avg_expense']))}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    Text(
+                      'Patrimônio: ${money(toDouble(figures['net_worth']))}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ],
                 ),
               ),
@@ -108,14 +120,22 @@ class _IndicatorRow extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text(indicator['label'], style: const TextStyle(fontWeight: FontWeight.w600))),
-              Text(score == null ? '--' : '$score', style: TextStyle(fontWeight: FontWeight.w800, color: ScoreGauge.colorFor(score))),
+              Expanded(
+                child: Text(indicator['label'], style: const TextStyle(fontWeight: FontWeight.w600)),
+              ),
+              Text(
+                score == null ? '--' : '$score',
+                style: TextStyle(fontWeight: FontWeight.w800, color: ScoreGauge.colorFor(score)),
+              ),
             ],
           ),
           const SizedBox(height: 6),
           ProgressBar(value: (score ?? 0) / 100, color: ScoreGauge.colorFor(score)),
           const SizedBox(height: 4),
-          Text(_format(indicator['key'], indicator['value']), style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor)),
+          Text(
+            _format(indicator['key'], indicator['value']),
+            style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor),
+          ),
         ],
       ),
     );
@@ -193,7 +213,9 @@ class _BudgetsCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         ProgressBar(value: toDouble(budgets[c.id]['usage'])),
                         const SizedBox(height: 2),
-                        Text('${money(toDouble(budgets[c.id]['spent']))} de ${money(toDouble(budgets[c.id]['budget']))}'),
+                        Text(
+                          '${money(toDouble(budgets[c.id]['spent']))} de ${money(toDouble(budgets[c.id]['budget']))}',
+                        ),
                       ],
                     ),
               trailing: const Icon(Icons.edit_outlined, size: 20),
@@ -206,7 +228,9 @@ class _BudgetsCard extends StatelessWidget {
 
   Future<void> _editBudget(BuildContext context, int categoryId, String name, Map<String, dynamic>? current) async {
     final state = context.read<AppState>();
-    final ctrl = TextEditingController(text: current == null ? '' : toDouble(current['budget']).toStringAsFixed(2).replaceAll('.', ','));
+    final ctrl = TextEditingController(
+      text: current == null ? '' : toDouble(current['budget']).toStringAsFixed(2).replaceAll('.', ','),
+    );
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -220,7 +244,11 @@ class _BudgetsCard extends StatelessWidget {
         actions: [
           if (current != null) TextButton(onPressed: () => Navigator.pop(ctx, 'remove'), child: const Text('Remover')),
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-          FilledButton(style: FilledButton.styleFrom(minimumSize: const Size(0, 40)), onPressed: () => Navigator.pop(ctx, 'save'), child: const Text('Salvar')),
+          FilledButton(
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
+            onPressed: () => Navigator.pop(ctx, 'save'),
+            child: const Text('Salvar'),
+          ),
         ],
       ),
     );

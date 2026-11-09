@@ -84,13 +84,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                 if (_register) ...[
                                   TextFormField(
                                     controller: _family,
-                                    decoration: const InputDecoration(labelText: 'Nome da família', hintText: 'Ex.: Família Silva', prefixIcon: Icon(Icons.home_outlined)),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nome da família',
+                                      hintText: 'Ex.: Família Silva',
+                                      prefixIcon: Icon(Icons.home_outlined),
+                                    ),
                                     validator: _required,
                                   ),
                                   const SizedBox(height: 12),
                                   TextFormField(
                                     controller: _name,
-                                    decoration: const InputDecoration(labelText: 'Seu nome', prefixIcon: Icon(Icons.person_outline)),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Seu nome',
+                                      prefixIcon: Icon(Icons.person_outline),
+                                    ),
                                     autofillHints: const [AutofillHints.name],
                                     validator: _required,
                                   ),
@@ -98,7 +105,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ],
                                 TextFormField(
                                   controller: _email,
-                                  decoration: const InputDecoration(labelText: 'E-mail', prefixIcon: Icon(Icons.mail_outline)),
+                                  decoration: const InputDecoration(
+                                    labelText: 'E-mail',
+                                    prefixIcon: Icon(Icons.mail_outline),
+                                  ),
                                   keyboardType: TextInputType.emailAddress,
                                   autofillHints: const [AutofillHints.email],
                                   validator: (v) => (v == null || !v.contains('@')) ? 'E-mail inválido' : null,
@@ -116,14 +126,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                   autofillHints: const [AutofillHints.password],
-                                  validator: (v) => (_register && (v ?? '').length < 8) ? 'Mínimo de 8 caracteres' : _required(v),
+                                  validator: (v) =>
+                                      (_register && (v ?? '').length < 8) ? 'Mínimo de 8 caracteres' : _required(v),
                                   onFieldSubmitted: (_) => _submit(),
                                 ),
                                 const SizedBox(height: 20),
                                 FilledButton(
                                   onPressed: _loading ? null : _submit,
                                   child: _loading
-                                      ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2))
+                                      ? const SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        )
                                       : Text(_register ? 'Criar conta' : 'Entrar'),
                                 ),
                                 TextButton(

@@ -13,7 +13,10 @@ const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
 const memberSchema = z.object({
   name: z.string().trim().min(1).max(80),
-  email: z.email().transform((e) => e.toLowerCase()).nullish(),
+  email: z
+    .email()
+    .transform((e) => e.toLowerCase())
+    .nullish(),
   password: z.string().min(8).max(128).nullish(),
   color: hexColor.optional(),
 });
