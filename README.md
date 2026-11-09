@@ -84,6 +84,15 @@ Depois, gere o app apontando para o endereço do servidor, por exemplo:
 flutter build apk --dart-define=API_URL=http://192.168.0.10:3000/api
 ```
 
+### Instalar no celular Android
+
+1. No GitHub, abra **Actions → Release Android → Run workflow** (opcionalmente informe o endereço da API).
+2. Ao terminar, a versão aparece em [Releases](https://github.com/gabriel1305rocha/FamilyFunds/releases) com o APK.
+3. No celular, baixe o `.apk`, permita instalar apps dessa fonte e abra o **Family Funds**.
+4. Na tela de login, toque em **Servidor** e informe o endereço da API (ex.: `192.168.0.10:3000`). O celular precisa estar na mesma rede Wi-Fi do servidor, ou acessá-lo por VPN/HTTPS.
+
+Para que as próximas versões atualizem o app sem desinstalar, configure a chave de assinatura uma única vez (veja [docs/android-assinatura.md](docs/android-assinatura.md)).
+
 > Para acessar fora de casa, coloque a API atrás de HTTPS (Caddy, Nginx ou um túnel como Tailscale/Cloudflare Tunnel). Veja [SECURITY.md](SECURITY.md).
 
 ## Testes e qualidade

@@ -45,6 +45,36 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _editServer() async {
+    final state = context.read<AppState>();
+    final ctrl = TextEditingController(text: state.serverUrl);
+    final value = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Servidor do Family Funds'),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          keyboardType: TextInputType.url,
+          decoration: const InputDecoration(
+            hintText: '192.168.0.10:3000',
+            helperText: 'Endereço do computador onde a API está rodando',
+          ),
+          onSubmitted: (v) => Navigator.pop(ctx, v),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+          FilledButton(
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
+            onPressed: () => Navigator.pop(ctx, ctrl.text),
+            child: const Text('Salvar'),
+          ),
+        ],
+      ),
+    );
+    if (value != null) await state.setServerUrl(value);
+  }
+
   String? _required(String? v) => (v == null || v.trim().isEmpty) ? 'Campo obrigatório' : null;
 
   @override
@@ -144,6 +174,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 TextButton(
                                   onPressed: () => setState(() => _register = !_register),
                                   child: Text(_register ? 'Já tenho conta' : 'Criar uma conta para a família'),
+                                ),
+                                TextButton.icon(
+                                  onPressed: _editServer,
+                                  icon: const Icon(Icons.dns_outlined, size: 18),
+                                  label: Text(
+                                    'Servidor: ${context.watch<AppState>().serverUrl}',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               ],
                             ),

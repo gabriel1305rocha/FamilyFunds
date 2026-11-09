@@ -1,10 +1,13 @@
 import 'package:family_funds/screens/login_screen.dart';
+import 'package:family_funds/services/api.dart';
+import 'package:family_funds/state/app_state.dart';
 import 'package:family_funds/theme.dart';
 import 'package:family_funds/utils/format.dart';
 import 'package:family_funds/widgets/common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   setUpAll(() => initializeDateFormatting('pt_BR'));
@@ -27,8 +30,20 @@ void main() {
     expect(hexColor(null), FFColors.green);
   });
 
-  testWidgets('tela de login alterna para cadastro', (tester) async {
-    await tester.pumpWidget(MaterialApp(theme: buildTheme(Brightness.light), home: const LoginScreen()));
+  test('normalizeApiUrl completa o endereço digitado', () {
+    expect(normalizeApiUrl('192.168.0.10:3000'), 'http://192.168.0.10:3000/api');
+    expect(normalizeApiUrl('https://financas.casa.com/'), 'https://financas.casa.com/api');
+    expect(normalizeApiUrl(' http://10.0.0.5:3000/api '), 'http://10.0.0.5:3000/api');
+  });
+
+  testWidgets('tela de login alterna para cadastro e mostra o servidor', (tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => AppState(ApiClient(baseUrl: 'http://192.168.0.10:3000/api')),
+        child: MaterialApp(theme: buildTheme(Brightness.light), home: const LoginScreen()),
+      ),
+    );
+    expect(find.text('Servidor: http://192.168.0.10:3000/api'), findsOneWidget);
     expect(find.text('Family Funds'), findsOneWidget);
     expect(find.text('Nome da família'), findsNothing);
     await tester.tap(find.text('Criar uma conta para a família'));

@@ -13,6 +13,7 @@ class AppState extends ChangeNotifier {
 
   final ApiClient api;
   static const _tokenKey = 'ff_token';
+  static const _serverKey = 'ff_api_url';
 
   bool ready = false;
   Member? me;
@@ -28,6 +29,7 @@ class AppState extends ChangeNotifier {
 
   Future<void> bootstrap() async {
     final prefs = await SharedPreferences.getInstance();
+    api.baseUrl = prefs.getString(_serverKey) ?? api.baseUrl;
     api.token = prefs.getString(_tokenKey);
     if (api.token != null) {
       try {
@@ -38,6 +40,16 @@ class AppState extends ChangeNotifier {
       }
     }
     ready = true;
+    notifyListeners();
+  }
+
+  /// Endereço da API em uso (ex.: http://192.168.0.10:3000/api).
+  String get serverUrl => api.baseUrl;
+
+  Future<void> setServerUrl(String input) async {
+    api.baseUrl = normalizeApiUrl(input);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_serverKey, api.baseUrl);
     notifyListeners();
   }
 
