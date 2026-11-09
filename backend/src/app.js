@@ -12,12 +12,27 @@ import transactionsRouter from './routes/transactions.js';
 import reportsRouter from './routes/reports.js';
 import { accountsRouter, budgetsRouter, categoriesRouter, goalsRouter, investmentsRouter } from './routes/resources.js';
 
-export function createApp() {
+const LOCAL_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+/** Libera CORS apenas para as origens configuradas (e localhost fora de produção). */
+export function isAllowedOrigin(origin, { env = config.env, allowed = config.corsOrigins } = {}) {
+  if (allowed.includes(origin)) return true;
+  return env !== 'production' && LOCAL_ORIGIN.test(origin);
+}
+
+export function createApp(options = {}) {
+  const settings = { ...config, ...options };
   const app = express();
 
-  app.set('trust proxy', config.trustProxy);
+  app.set('trust proxy', settings.trustProxy);
   app.use(helmet());
-  app.use(cors({ origin: config.corsOrigin }));
+  app.use(
+    cors({
+      // Requisições sem Origin (app mobile, curl) não passam pelo CORS.
+      origin: (origin, callback) =>
+        callback(null, !origin || isAllowedOrigin(origin, { env: settings.env, allowed: settings.corsOrigins })),
+    }),
+  );
   app.use(express.json({ limit: '1mb' }));
 
   app.get('/health', async (_req, res) => {
@@ -29,16 +44,26 @@ export function createApp() {
     }
   });
 
-  // Limita tentativas de login/cadastro para dificultar ataques de força bruta.
+  // Limite geral por IP, para evitar abuso da API.
+  const apiLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    limit: settings.apiRateLimit,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { error: 'Muitas requisições. Aguarde um instante e tente novamente.' },
+  });
+
+  // Limite mais rígido para login/cadastro, contra ataques de força bruta.
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: config.authRateLimit,
+    limit: settings.authRateLimit,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     message: { error: 'Muitas tentativas. Aguarde alguns minutos e tente novamente.' },
   });
 
   const api = express.Router();
+  api.use(apiLimiter);
   api.use('/auth/login', authLimiter);
   api.use('/auth/register', authLimiter);
   api.use('/auth', authRouter);

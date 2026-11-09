@@ -1,6 +1,7 @@
 import { after, before, describe, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { app, pool, registerFamily, request, resetDb } from './helpers.js';
+import { createApp, isAllowedOrigin } from '../src/app.js';
 import { currentMonth } from '../src/services/dates.js';
 
 before(resetDb);
@@ -262,5 +263,33 @@ describe('infra', () => {
   test('healthcheck confirma conexão com o banco', async () => {
     const res = await request(app).get('/health').expect(200);
     assert.deepEqual(res.body, { status: 'ok', database: 'ok' });
+  });
+});
+
+describe('proteções', () => {
+  test('CORS só libera origens permitidas', async () => {
+    const ok = await request(app).get('/health').set('Origin', 'http://localhost:8080');
+    assert.equal(ok.headers['access-control-allow-origin'], 'http://localhost:8080');
+    const blocked = await request(app).get('/health').set('Origin', 'https://site-malicioso.example');
+    assert.equal(blocked.headers['access-control-allow-origin'], undefined);
+
+    const prod = { env: 'production', allowed: ['https://financas.minhacasa.com'] };
+    assert.equal(isAllowedOrigin('https://financas.minhacasa.com', prod), true);
+    assert.equal(isAllowedOrigin('http://localhost:8080', prod), false);
+  });
+
+  test('login é bloqueado após muitas tentativas', async () => {
+    const limited = createApp({ authRateLimit: 2 });
+    const body = { email: 'ninguem@test.com', password: 'errada!!' };
+    await request(limited).post('/api/auth/login').send(body).expect(401);
+    await request(limited).post('/api/auth/login').send(body).expect(401);
+    const res = await request(limited).post('/api/auth/login').send(body).expect(429);
+    assert.match(res.body.error, /Muitas tentativas/);
+  });
+
+  test('API inteira tem limite de requisições', async () => {
+    const limited = createApp({ apiRateLimit: 1 });
+    await request(limited).get('/api/auth/me').expect(401);
+    await request(limited).get('/api/auth/me').expect(429);
   });
 });

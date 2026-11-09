@@ -72,6 +72,8 @@ flutter run --dart-define=API_URL=http://10.0.2.2:3000/api   # emulador Android
 # Na raiz do projeto, crie um .env com um segredo forte (pelo menos 32 caracteres):
 echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
 echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)" >> .env
+# Só se for usar o app web: o endereço onde ele estará publicado
+echo "CORS_ORIGIN=http://192.168.0.10:8080" >> .env
 
 docker compose --profile full up -d --build
 ```
