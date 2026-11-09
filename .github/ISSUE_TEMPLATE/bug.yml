@@ -1,0 +1,32 @@
+name: Problema / bug
+description: Algo não está funcionando como deveria
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: O que aconteceu?
+      description: Descreva o problema e o que você esperava que acontecesse.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Como reproduzir
+      placeholder: |
+        1. Abrir a tela de Lançamentos
+        2. Tocar em ...
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Onde?
+      options: [App Android, App iOS, App Web, API]
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs ou prints
+      description: Não inclua senhas, tokens nem dados financeiros reais.
